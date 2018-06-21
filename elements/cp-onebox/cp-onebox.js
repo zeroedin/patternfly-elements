@@ -89,26 +89,26 @@ const bindTemplate = data => {
   .description {
     order: 0; } }</style>
 <!-- Rule Type (Product, Product Suite or Vulnerability) -->
-<h2 class="content">${data.product ||
-    data.product_suite ||
-    data.vulnerability_name}</h2>
+<h2 class="content">${data.name}</h2>
 
 <!-- Description (Every Rule has a description) -->
 <p class="description content">${data.description}</p>
 
 <!-- Subtitle is only for Product type of rule -->
-${(data.subtitle || "") && `<p class="subtitle">${data.subtitle}</p>`}
+${(data.additional_info.subtitle || "") &&
+    `<p class="subtitle">${data.additional_info.subtitle}</p>`}
 
 <!-- Page Link and Produc list are only for Product Suite type of rule -->
-${(data.page_link || "") && `<p class="page-link">${data.page_link}</p>`}
+${(data.additional_info.page_link || "") &&
+    `<p class="page-link">${data.additional_info.page_link}</p>`}
 
 ${
-    data.products
+    data.additional_info.products
       ? `
   <div class="content">
       <h4>Products</h4>
     <ul class="products">
-      ${data.products
+      ${data.additional_info.products
         .map(
           product => `
         <li>
@@ -124,11 +124,14 @@ ${
   }
 
 <!-- CVE, Common Name, Severity are only for Vulnerability type of rule -->
-${(data.cve || "") && `<p class="cve">${data.cve}</p>`}
-${(data.common_name || "") && `<p class="common-name">${data.common_name}</p>`}
-${(data.severity || "") && `<p class="severity">${data.severity}</p>`}
+${(data.additional_info.cve || "") &&
+    `<p class="cve">${data.additional_info.cve}</p>`}
+${(data.additional_info.common_name || "") &&
+    `<p class="common-name">${data.additional_info.common_name}</p>`}
+${(data.additional_info.severity || "") &&
+    `<p class="severity">${data.additional_info.severity}</p>`}
 
-<!-- Info and Knowledgebase Links for every type of rule (Every Rule has a description) -->
+<!-- Info Links for every type of rule -->
 ${data.links.info &&
     `
   <div class="content">
@@ -155,25 +158,8 @@ ${data.links.info &&
   <button id="expandButton">
     <span class="caret"></span>
   </button>
-  About ${data.product}
+  About ${data.name}
 </div>
-
-
-${data.links.knowledgebase &&
-    `
-  <div class="product_links content">
-    <h4>Knowledgebase Links</h4>
-    <ul>
-    ${data.links.knowledgebase
-      .map(
-        link => `
-      <li><a href="${link.link}">${link.text}</a></li>
-    `
-      )
-      .join("\n")}
-    </ul>
-  </div>
-`}
 `;
   return template;
 };
