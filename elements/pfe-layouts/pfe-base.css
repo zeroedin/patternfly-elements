@@ -81,15 +81,15 @@ body {
   text-align: left; }
 
 a {
-  color: var(--pfe-broadcasted--color--ui-link, #06c);
+  color: var(--pfe-broadcasted--color--ui-link, pink);
   text-decoration: var(--pfe-theme--link--text-decoration, underline); }
   a:visited {
     color: var(--pfe-broadcasted--color--ui-link--visited, rebeccapurple); }
   a:hover {
-    color: var(--pfe-broadcasted--color--ui-link--hover, #003366);
+    color: var(--pfe-broadcasted--color--ui-link--hover, #ff5a77);
     text-decoration: var(--pfe-theme--link--text-decoration--hover, underline); }
   a:focus {
-    color: var(--pfe-broadcasted--color--ui-link--focus, #003366); }
+    color: var(--pfe-broadcasted--color--ui-link--focus, #ff5a77); }
 
 button,
 a {
