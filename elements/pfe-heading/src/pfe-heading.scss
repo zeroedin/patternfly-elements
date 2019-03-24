@@ -44,6 +44,7 @@
 ::slotted([pfe-heading="headline-6"]) {
     font-size: #{pfe-var(font-size--heading--zeta)};
 }
-.test {
-	 color: #{pfe-color(ui-link)};
+
+::slotted(*:last-child) {
+	margin-bottom: 0;
 }
