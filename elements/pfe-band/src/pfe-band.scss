@@ -4,8 +4,11 @@ $LOCAL: band;
 
 %flex-fallback {
     display: flex;
+    align-items: stretch;
     flex-flow: column nowrap;
-    align-items: flex-start;
+    border: 2px solid orange;
+    // align-items: flex-start;
+
 }
 
 %grid-layout {
@@ -70,7 +73,7 @@ $LOCAL: band;
   position: relative;
   @extend %flex-fallback;
 
-  // Padding 
+  // Padding
   padding: calc(#{pfe-local(Padding--vertical)} / 2)  #{pfe-local(Padding--horizontal)};
 
   @media (min-width: #{pfe-breakpoint(sm)}) {
@@ -110,6 +113,7 @@ $LOCAL: band;
   --pfe-band--Padding:   calc(#{pfe-local(Padding--vertical)} / 4)  #{pfe-local(Padding--horizontal)};
 }
 
+
 .pfe-band {
   &__container {
     // Does not need to be wrapped in @supports because it updates variables
@@ -130,6 +134,9 @@ $LOCAL: band;
       &[pfe-aside-mobile="top"] {
         --pfe-band--gridTemplateArea_mobile:
           "aside" "body";
+          // > {
+          //      border: 2px solid blue;
+          // }
       }
       &[pfe-aside-desktop="left"] {
         --pfe-band--gridTemplateArea_desktop:
@@ -146,17 +153,17 @@ $LOCAL: band;
       --pfe-band--gridTemplateArea_mobile:
         "header" "body";
       &[pfe-has-aside] {
-        --pfe-band--gridTemplateArea_mobile:  
-          "header" 
+        --pfe-band--gridTemplateArea_mobile:
+          "header"
           "body" "aside";
-        --pfe-band--gridTemplateArea_desktop: 
-          "header header" 
+        --pfe-band--gridTemplateArea_desktop:
+          "header header"
           "body aside";
       }
       &[pfe-aside-mobile="top"] {
-        --pfe-band--gridTemplateArea_mobile:  
-          "aside" 
-          "header" 
+        --pfe-band--gridTemplateArea_mobile:
+          "aside"
+          "header"
           "body";
       }
       &[pfe-aside-height="full"] {
@@ -261,6 +268,7 @@ $LOCAL: band;
 
     // Grid support styles
     @supports (display: grid) {
+    // @supports (display: grid) and ( not (display:-ms-grid) ) {
       @extend %grid-layout;
       grid-template-columns: #{pfe-local(layout)};
       grid-template-rows:    max-content;
@@ -272,11 +280,15 @@ $LOCAL: band;
   }
   // For each section in the band layout
   @each $section in (header, body, aside, footer) {
+      border: 3px solid black;
     &__#{$section} { // i.e., pfe-band__header
-      @extend %flex-fallback; // Add the flex fallback styles
+      // @extend %flex-fallback; // Add the flex fallback styles
+      // border: 3px dashed black;
       margin-bottom: #{pfe-local(gutter--vertical)};
       // Apply the standard grid
+      // @supports (display: grid) {
       @supports (display: grid) {
+          // border: 5px solid blue;
           @extend %grid-layout;
           // Apply the section as a named grid-area
           grid-area: #{$section};
@@ -289,4 +301,5 @@ $LOCAL: band;
   &__aside {
     align-self: stretch;
   }
+
 }
