@@ -1,6 +1,6 @@
 <pfe-icon></pfe-icon>
 <div class="content">
-  <slot class="header" name="header"></slot>
+  ${this.has_slot("pfe-icon-panel--header") ? `<slot class="header" name="header"></slot>` : ""}
   <slot class="body"></slot>
-  <slot class="footer" name="footer"></slot>
+  ${this.has_slot("pfe-icon-panel--footer") ? `<slot class="footer" name="footer"></slot>` : ""}
 </div>
