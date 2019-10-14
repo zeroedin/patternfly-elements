@@ -1,0 +1,20 @@
+@import "../../pfe-sass/pfe-sass";
+:host {
+  display: inline-block;
+  padding: 16px;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+div {
+  padding: .125rem .75rem;
+  background-color: #acacac;
+  color: #000;
+  border-radius: 8px;
+}
+
+:host([read]) div {
+  background-color: black;
+}
