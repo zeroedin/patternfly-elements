@@ -1,0 +1,16 @@
+@import "../../pfe-sass/pfe-sass";
+:host {
+  display: block;
+  position: relative;
+
+  padding: 20px;
+  border: 1px solid black;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+::slotted(p) {
+  color: pink;
+}

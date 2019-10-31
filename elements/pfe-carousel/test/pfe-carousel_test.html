@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="/components/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="/components/web-component-tester/browser.js"></script>
+    <script type="module" src="../dist/pfe-carousel.js"></script>
+  </head>
+  <body>
+
+    <pfe-carousel>
+      This is the element content.
+    </pfe-carousel>
+
+    <script>
+      suite('<pfe-carousel>', () => {
+        test('it should upgrade', () => {
+          assert.instanceOf(document.querySelector('pfe-carousel'), customElements.get("pfe-carousel", 'pfe-carousel should be an instance of pfeCarousel'));
+        });
+
+        // you need to write more tests!!!
+
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,41 @@
+@import "../../pfe-sass/pfe-sass";
+
+$LOCAL: carousel;
+
+:host {
+  --pfe-carousel--BackgroundColor: pink;
+  --pfe-carousel--Color: black;
+  --pfe-carousel__indicator--Color: green;
+
+  display: block;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+:host(:hover) {
+  --pfe-carousel__indicator--Color: magenta;
+
+  @include browser_query(ie11) {
+        .pfe-carousel__indicator--left,
+        .pfe-carousel__indicator--right {
+          border-top-color: magenta;
+        }
+  }
+}
+
+.pfe-carousel {
+  &__indicator {
+    &--left {
+      @include pfe-arrow(left, #{pfe-local($cssvar: Color, $region: indicator)});
+      top: 50%;
+      left: 30px;
+    }
+    &--right {
+      @include pfe-arrow(right, #{pfe-local($cssvar: Color, $region: indicator)});
+      top: 50%;
+      right: 30px;
+    }
+  }
+}
