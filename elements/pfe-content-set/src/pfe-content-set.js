@@ -144,6 +144,10 @@ class PfeContentSet extends PFElement {
     if (this.vertical.value !== null && this.vertical.value !== false) {
       tabs.setAttribute("vertical", true);
     }
+    // If the alignment is set, add that attribute to the tabs
+    if (this.align.value !== this.align.default ) {
+      tabs.setAttribute("pfe-tab-align", this.align.value);
+    }
 
     // Pass the variant attribute down to the tabs component
     if (this.variant.value !== this.variant.default) {

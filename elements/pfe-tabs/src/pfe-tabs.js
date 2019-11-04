@@ -127,7 +127,7 @@ class PfeTabs extends PFElement {
   }
 
   static get observedAttributes() {
-    return ["vertical", "selected-index", "pfe-variant", "on"];
+    return ["vertical", "pfe-tab-align", "selected-index", "pfe-variant", "on"];
   }
 
   get selectedIndex() {
@@ -278,6 +278,9 @@ class PfeTabs extends PFElement {
             ) {
               if (this.variant.value) {
                 addedNode.setAttribute("pfe-variant", this.variant.value);
+              }
+              if (this.align.value) {
+                addedNode.setAttribute("pfe-tab-align", this.align.value);
               }
             }
           });
