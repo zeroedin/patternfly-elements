@@ -2,4 +2,13 @@
     <slot name="pfe-filter-list--header"></slot>
 </div>
 <input type="search" placeholder="Search"/>
-<slot></slot>
+<slot class="pfe-filter-list__body">
+    <div class="pfe-filter-list__visible"></div>
+    <pfe-collapse-panel class="pfe-filter-list__collapsed">
+        
+    </pfe-collapse-panel>
+    <!-- pfe-collapse-panel > ul > li >  -->
+</slot>
+<pfe-collapse-toggle>
+    <slot name="expand-text"></slot>
+</pfe-collapse-toggle>
