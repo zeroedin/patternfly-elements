@@ -37,6 +37,8 @@ class PfeFilterList extends PFElement {
     // Handle when a "clear all button is pressed"
     clearBtn.addEventListener("click", _resetState);
 
+    //@TODO methods for handling what the user puts into a searchbar
+
     // https://www.w3.org/TR/wai-aria-practices/#checkbox
     // Reference for WAI best practices for accessibility
   }
