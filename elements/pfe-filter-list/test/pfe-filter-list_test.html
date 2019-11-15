@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="/components/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="/components/web-component-tester/browser.js"></script>
+    <script type="module" src="../pfe-filter-list.js"></script>
+  </head>
+  <body>
+
+    <pfe-filter-list>
+      This is the element content.
+    </pfe-filter-list>
+
+    <script>
+      suite('<pfe-filter-list>', () => {
+        test('it should upgrade', () => {
+          assert.instanceOf(document.querySelector('pfe-filter-list'), customElements.get("pfe-filter-list", 'pfe-filter-list should be an instance of pfeFilterList'));
+        });
+
+        // you need to write more tests!!!
+
+      });
+    </script>
+  </body>
+</html>

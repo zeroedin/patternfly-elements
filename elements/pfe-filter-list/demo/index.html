@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>PatternFly Element | pfe-filter-list Demo</title>
+
+    <noscript>
+      <link href="../../pfelement/pfelement-noscript.min.css" rel="stylesheet">
+    </noscript>
+
+    <link href="../../pfelement/pfelement.min.css" rel="stylesheet">
+
+    <!-- uncomment the es5-adapter if you're using the umd version -->
+    <script src="/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
+    <script src="/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
+    <script>require(['../dist/pfe-filter-list.umd.js'])</script>
+  </head>
+  <body unresolved>
+    <h1>&lt;pfe-filter-list&gt;</h1>
+    <pfe-filter-list>
+      <h2 slot="pfe-filter-list--header">Vendor</h2>
+      <ul id="filter-list">
+        <li>
+          <input type="checkbox" id="vendor-1" name="vendor-1">
+          <label for="vendor-1">Amazon</label>
+        </li>
+        <li>
+          <input type="checkbox" id="vendor-2" name="vendor-2">
+          <label for="vendor-1">Canon</label>
+        </li>
+        <li>
+          <input type="checkbox" id="vendor-3" name="vendor-3">
+          <label for="vendor-1">Google</label>
+        </li>
+        <li>
+          <input type="checkbox" id="vendor-4" name="vendor-4">
+          <label for="vendor-1">IBM</label>
+        </li>
+        <li>
+          <input type="checkbox" id="vendor-5" name="vendor-5">
+          <label for="vendor-1">Microsoft</label>
+        </li>
+      </ul>
+    </pfe-filter-list>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+@import "../../pfe-sass/pfe-sass";
+:host {
+  display: block;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+::slotted(ul) {
+  list-style: none;
+  padding: 0;
+}
+
+::slotted(#vendor-1){
+  padding-right: 15px;
+}
