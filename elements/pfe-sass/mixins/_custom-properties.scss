@@ -182,17 +182,36 @@
 /// }
 /// ```
 /// ===========================================================================
-@mixin pfe-surfaces($surfaces: $SURFACE, $attr-name: #{$repo}-color) {
-    @each $color in $surfaces {
-        $theme: #{pfe-get-theme(surface--#{$color}--theme)};
-        :host([#{$attr-name}="#{$color}"]) {
-            @include pfe-set-local(
-                ( BackgroundColor: #{pfe-color(surface--#{$color})} )
-            );
-            --theme: var(--pfe-theme--color--surface--#{$color}--theme, #{$theme});
-            @include browser-query(ie11) {
-                background-color: #{map-get($pfe-colors, surface--lightest)} !important;
-                color: #{pfe-color(text)} !important;
+@mixin pfe-surfaces($surfaces: $SURFACE, $attr-name: #{$repo}-color, $host: true) {
+    @if $host == true { 
+        @each $color in $surfaces {
+            $theme: #{pfe-get-theme(surface--#{$color}--theme)};
+            :host([#{$attr-name}="#{$color}"]) {
+                @include pfe-set-local(
+                    ( BackgroundColor: #{pfe-color(surface--#{$color})} )
+                );
+                --theme: var(--pfe-theme--color--surface--#{$color}--theme, #{$theme});
+                @include browser-query(ie11) {
+                    background-color: #{map-get($pfe-colors, surface--lightest)} !important;
+                    color: #{pfe-color(text)} !important;
+                }
+            }
+        }
+    }
+    @else {
+        @each $color in $surfaces {
+            $theme: #{pfe-get-theme(surface--#{$color}--theme)};
+
+            &[#{$attr-name}="#{$color}"] {
+                --foo: green;
+                @include pfe-set-local(
+                    ( BackgroundColor: #{pfe-color(surface--#{$color})} )
+                );
+                --theme: var(--pfe-theme--color--surface--#{$color}--theme, #{$theme});
+                @include browser-query(ie11) {
+                    background-color: #{map-get($pfe-colors, surface--lightest)} !important;
+                    color: #{pfe-color(text)} !important;
+                }
             }
         }
     }
@@ -233,16 +252,34 @@
 /// ```
 /// ...as well as all the values for :host([on="saturated"])  and  :host([on="light"]) 
 /// ===========================================================================
-@mixin pfe-theme-contexts($themes: $THEMES, $ie-fallback: true) {
+@mixin pfe-theme-contexts($themes: $THEMES, $ie-fallback: true, $host: true) {
     // Helper attributes to aid in theming
-    @each $theme in $themes {
-        :host([on="#{$theme}"]) {
-            @include pfe-set-broadcast-theme($theme);
+    
+    @if $host == true { 
+        @each $theme in $themes {
+            :host([on="#{$theme}"]) {
+                @include pfe-set-broadcast-theme($theme);
+            }
+            @if $ie-fallback {
+                @include browser-query(ie11) {
+                    :host {
+                        color: #{pfe-color(text)} !important;
+                    }
+                }
+            }
         }
-        @if $ie-fallback {
-            @include browser-query(ie11) {
-                :host {
-                    color: #{pfe-color(text)} !important;
+    }
+    @else {
+        @each $theme in $themes {
+            &[on="#{$theme}"] {
+                @include pfe-set-broadcast-theme($theme);
+                  border: yellow solid 3px;
+            }
+            @if $ie-fallback {
+                @include browser-query(ie11) {
+                    &[on="#{$theme}"] {
+                        color: #{pfe-color(text)} !important;
+                    }
                 }
             }
         }

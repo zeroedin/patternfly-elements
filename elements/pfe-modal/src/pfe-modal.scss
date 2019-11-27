@@ -52,8 +52,12 @@ $pfe-modal--breakpoint--medium: 640px;
 		}
 	}
 	&__window {
-		@include pfe-set-broadcast-theme(light);
-		--theme: light;
+
+
+		// Pull in pfe-color settings for all supported surface colors
+		@include pfe-surfaces($host: false);
+		@include pfe-theme-contexts($host: false); // imports on="light" etc support
+
 
 		position: relative;
 		max-width: #{pfe-local(MaxWidth--mobile)};

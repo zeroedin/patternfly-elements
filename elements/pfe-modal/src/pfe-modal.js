@@ -24,6 +24,20 @@ class PfeModal extends PFElement {
     return "pfe-modal.scss";
   }
 
+  // Get the theme variable if it exists, set it as an attribute
+  context_set(fallback) {
+    let theme = this.cssVariable("theme");
+    if (!theme) {
+      theme = this.getAttribute("pfe-theme");
+    }
+    if (!theme && fallback) {
+      theme = fallback;
+    }
+    if (theme) {
+      this.setAttribute("on", theme);
+    }
+  }
+
   // Declare the type of this component
   static get PfeType() {
     return PFElement.PfeTypes.Container;
