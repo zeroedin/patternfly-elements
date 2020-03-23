@@ -61,17 +61,18 @@ $variables: (
   // Active tab styles
   // TODO: ShadyCSS falls flat on this pseudo element in IE11 `:host(:focus-visible)`, add back when we drop ShadyCSS
   @at-root #{&}(:focus) {
-    --pfe-tabs--Color: #{pfe-color(text)};
+    color: #{pfe-local(focus)};
     outline: #{pfe-var(ui--focus-outline-width)} outset #{pfe-local(focus)};
   }
 
   @at-root #{&}([on="dark"]) {
     --pfe-tabs--Color: #{darken($pfe-color--white, 20%)};
     --pfe-tabs--focus: #{pfe-color(link--focus--on-dark)};
+    --pfe-tabs--highlight: #{pfe-color(text--on-dark)};
   }
 
   @at-root #{&}([on="saturated"]) {
-    --pfe-tabs--Color: #{darken($pfe-color--white, 20%)};
+    --pfe-tabs--Color: #{pfe-color(link--on-saturated)};
     --pfe-tabs--focus: #{pfe-color(link--focus--on-saturated)};
     --pfe-tabs--highlight: #{pfe-color(text--on-saturated)};
   }
