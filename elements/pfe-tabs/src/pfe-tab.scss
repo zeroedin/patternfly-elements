@@ -66,6 +66,7 @@ $variables: (
   }
 
   @at-root #{&}([on="dark"]) {
+    --pfe-tabs--Color: #{darken($pfe-color--white, 20%)};
     --pfe-tabs--focus: #{pfe-color(link--focus--on-dark)};
   }
 
