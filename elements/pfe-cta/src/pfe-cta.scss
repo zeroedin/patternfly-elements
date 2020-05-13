@@ -6,10 +6,6 @@ $LOCAL: cta;
 $pfe-cta--BackgroundColor--focus: rgba(40, 151, 240, 0.2);
 $pfe-cta--Color--fallback: #003366;
 
-// Arrow animation
-$horizontal-spacing: 3px;
-$arrow-basic: 0 $horizontal-spacing;
-$arrow-hover: 0 0 0 #{$horizontal-spacing * 2};
 
 
 $variables: (
@@ -32,7 +28,7 @@ $variables: (
   FontSize--priority: calc(#{pfe-local($cssvar: FontSize) / 1.125}),
   arrow: (
     Display: inline,
-    Padding: #{$arrow-basic},
+    Padding: 3px,
     size: 13px,
     MarginLeft: calc(#{pfe-var(content-spacer)} * 0.25)
   ),
@@ -42,6 +38,11 @@ $variables: (
     BorderColor--focus: transparent
   )
 );
+
+// Arrow animation
+$arrow-basic: 0 #{pfe-local($cssvar: Padding, $region: arrow)};
+$arrow-hover: 0 0 0 calc(#{pfe-local($cssvar: Padding, $region: arrow)} * 2);
+
 
 :host {
   @include pfe-print-variables($variables);
@@ -192,7 +193,7 @@ $variables: (
   }
   &--arrow {
     display: #{pfe-local($cssvar: Display, $region: arrow)};
-    padding: #{pfe-local($cssvar: Padding, $region: arrow)};
+    padding: $arrow-basic;
     fill: #{pfe-local(Color)};
     width: #{pfe-local($cssvar: size, $region: arrow)};
     height: #{pfe-local($cssvar: size, $region: arrow)};
