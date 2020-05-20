@@ -18,7 +18,7 @@ class PfeCarousel extends PFElement {
     return "pfe-carousel.json";
   }
 
-  set show_indicators (show) {
+  set show_indicators(show) {
     if (show) {
       this.classList.add("show_indicators");
     } else {
@@ -26,7 +26,7 @@ class PfeCarousel extends PFElement {
     }
   }
 
-  get show_indicators () {
+  get show_indicators() {
     return this.classList.contains("show_indicators");
   }
 

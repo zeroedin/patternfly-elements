@@ -70,15 +70,20 @@ stories.add(PfeCard.tag, () => {
 
   // If they do, prompt them for the image properties
   if (imageValue) {
-    let overflow = storybookBridge.select("Image overflow?", {
-      null: "no overflow",
-      top: "top & sides",
-      bottom: "bottom & sides",
-      sides: "sides only"
-    }, "no overflow", "Image");
+    let overflow = storybookBridge.select(
+      "Image overflow?",
+      {
+        "no overflow": null,
+        "top & sides": "top",
+        "bottom & sides": "bottom",
+        "sides only": "sides"
+      },
+      null,
+      "Image"
+    );
 
     // Create the overflow attribute value based on user selections
-    switch(overflow) {
+    switch (overflow) {
       case "top":
         overflowAttr.push("top");
         overflowAttr.push("right");
@@ -96,18 +101,17 @@ stories.add(PfeCard.tag, () => {
         break;
     }
 
-    image = `<img src=\"https://placekitten.com/1000/300\" ${overflowAttr.length > 0 ? ` pfe-overflow=\"${overflowAttr.join(" ")}\"` : ""}/>`;
-    if(region === "footer") {
-      slots.footer.default = image;
-    } else {
-      slots.body.default = image + slots.body.default;
-    }
+    image = `<img src=\"https://placekitten.com/1000/300\" ${
+      overflowAttr.length > 0
+        ? `pfe-overflow=\"${overflowAttr.join(" ")}\"`
+        : ""
+    }/>`;
   }
 
   // Create an object for the footer attributes
   let footerAttrs = {};
 
-  if (!imageValue || imageValue && !overflowAttr.includes("bottom")) {
+  if (!imageValue || (imageValue && !overflowAttr.includes("bottom"))) {
     let ctaText;
     let ctaLink;
 
@@ -125,7 +129,7 @@ stories.add(PfeCard.tag, () => {
       const ctaPriorityValue = storybookBridge.select(
         "Priority",
         {
-          null: "default",
+          default: null,
           primary: "primary",
           secondary: "secondary"
         },
@@ -150,19 +154,28 @@ stories.add(PfeCard.tag, () => {
   // Trigger the auto generation of the knobs for slots
   config.has = tools.autoContentKnobs(slots, storybookBridge);
 
-  // prettier-ignore
-  config.slots = [{
-    slot: "pfe-card--header",
-    content: tools.customTag({
-      tag: "h3",
-      content: config.has.header
-    })
-  }, {
-    content: config.has.body
-  }, {
-    slot: "pfe-card--footer",
-    content: config.has.footer
-  }];
+  config.slots = [];
+
+  if (config.has.header.length > 0) {
+    config.slots.push({
+      slot: "pfe-card--header",
+      content: tools.customTag({
+        tag: "h3",
+        content: config.has.header
+      })
+    });
+  }
+
+  config.slots.push({
+    content: region !== "footer" ? image + config.has.body : config.has.body
+  });
+
+  if (config.has.footer.length > 0) {
+    config.slots.push({
+      slot: "pfe-card--footer",
+      content: region === "footer" ? image : config.has.footer
+    });
+  }
 
   // Some attribute values don't need to be included in the markup
   if (config.prop.color === "base") {

@@ -2,9 +2,13 @@
   "name": "@patternfly/pfelement",
   "pfelement": {
     "className": "PFElement",
-    "elementName": "pfelement"
+    "elementName": "pfelement",
+    "assets": [
+      "pfelement.*css",
+      "pfelement.*css.map"
+    ]
   },
-  "version": "1.0.0-prerelease.27",
+  "version": "1.0.0-prerelease.48",
   "publishConfig": {
     "access": "public"
   },
@@ -27,6 +31,7 @@
   "scripts": {
     "build": "../../node_modules/.bin/gulp && ../../node_modules/.bin/prettier --ignore-path ../../.prettierignore --write '**/*.{js,json}'",
     "dev": "../../node_modules/.bin/gulp dev",
+    "watch": "../../node_modules/.bin/gulp watch",
     "test": "../../node_modules/.bin/wct --configFile ../../wct.conf.json elements/pfelement/test/"
   },
   "contributors": [

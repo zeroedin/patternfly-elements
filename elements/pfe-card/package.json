@@ -4,7 +4,7 @@
     "className": "PfeCard",
     "elementName": "pfe-card"
   },
-  "version": "1.0.0-prerelease.27",
+  "version": "1.0.0-prerelease.48",
   "publishConfig": {
     "access": "public"
   },
@@ -24,15 +24,10 @@
   "files": [
     "dist"
   ],
-  "files": [
-    "pfe-card.*js",
-    "pfe-card.*js.map",
-    "pfe-card--lightdom.*css",
-    "pfe-card--lightdom.*css.map"
-  ],
   "scripts": {
     "build": "../../node_modules/.bin/gulp && ../../node_modules/.bin/prettier --ignore-path ../../.prettierignore --write '**/*.{js,json}'",
     "dev": "../../node_modules/.bin/gulp dev",
+    "watch": "../../node_modules/.bin/gulp watch",
     "test": "../../node_modules/.bin/wct --configFile ../../wct.conf.json elements/pfe-card/test/"
   },
   "contributors": [
@@ -51,8 +46,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@patternfly/pfe-sass": "^1.0.0-prerelease.27",
-    "@patternfly/pfelement": "^1.0.0-prerelease.27"
+    "@patternfly/pfe-sass": "^1.0.0-prerelease.45",
+    "@patternfly/pfelement": "^1.0.0-prerelease.48"
   },
   "generator-pfelement-version": "0.5.0",
   "bugs": {

@@ -1,65 +1,64 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Carousel",
-    "description": "This element creates a header, body, and footer region in which to place content or other components.",
-    "type": "object",
-    "tag": "pfe-carousel",
-    "class": "pfe-carousel",
-    "category": "container",
-    "properties": {
-      "slots": {
-        "title": "Slots",
-        "description": "Definition of the supported slots",
-        "type": "object",
-        "properties": {
-          "slide": {
-            "title": "Slide",
-            "type": "array",
-            "namedSlot": false,
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "raw"
-                }
-              ]
-            }
-          }
-        }
-      },
-      "attributes": {
-        "title": "Attributes",
-        "type": "object",
-        "properties": {
-          "color": {
-            "title": "Background color",
-            "type": "string",
-            "enum": [
-              "lightest",
-              "lighter",
-              "base",
-              "darker",
-              "darkest",
-              "complement",
-              "accent"
-            ],
-            "prefixed": true,
-            "observer": "_colorChanged"
-          },
-          "img-src": {
-            "title": "Background image",
-            "type": "string",
-            "observer": "_imgSrcChanged"
-          },
-          "size": {
-            "title": "Padding size",
-            "type": "string",
-            "enum": ["small"],
-            "observer": "_basicAttributeChanged"
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Carousel",
+  "description": "This element creates a header, body, and footer region in which to place content or other components.",
+  "type": "object",
+  "tag": "pfe-carousel",
+  "class": "pfe-carousel",
+  "category": "container",
+  "properties": {
+    "slots": {
+      "title": "Slots",
+      "description": "Definition of the supported slots",
+      "type": "object",
+      "properties": {
+        "slide": {
+          "title": "Slide",
+          "type": "array",
+          "namedSlot": false,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "raw"
+              }
+            ]
           }
         }
       }
     },
-    "required": ["slots", "attributes"],
-    "additionalProperties": false
-  }
-  
+    "attributes": {
+      "title": "Attributes",
+      "type": "object",
+      "properties": {
+        "color": {
+          "title": "Background color",
+          "type": "string",
+          "enum": [
+            "lightest",
+            "lighter",
+            "base",
+            "darker",
+            "darkest",
+            "complement",
+            "accent"
+          ],
+          "prefixed": true,
+          "observer": "_colorChanged"
+        },
+        "img-src": {
+          "title": "Background image",
+          "type": "string",
+          "observer": "_imgSrcChanged"
+        },
+        "size": {
+          "title": "Padding size",
+          "type": "string",
+          "enum": ["small"],
+          "observer": "_basicAttributeChanged"
+        }
+      }
+    }
+  },
+  "required": ["slots", "attributes"],
+  "additionalProperties": false
+}
