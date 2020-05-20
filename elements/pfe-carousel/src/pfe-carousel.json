@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Carousel",
+  "description": "A layout that provides the necessary navigational elements for a sliding carousel.",
+  "type": "object",
+  "tag": "pfe-carousel",
+  "class": "PfeCarousel",
+  "category": "container",
+  "properties": {
+    "slots": {
+      "title": "Slots",
+      "description": "Definition of the supported slots",
+      "type": "object",
+      "properties": {
+        "slides": {
+          "title": "Default slot",
+          "type": "array",
+          "namedSlot": false,
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "pfe-carousel-slide"
+              }
+            ]
+          }
+        }
+      },
+      "required": ["slides"]
+    },
+    "attributes": {
+      "title": "Attributes",
+      "type": "object",
+      "properties": {
+        "color": {
+          "title": "Color",
+          "type": "string",
+          "enum": [
+            "lightest",
+            "lighter",
+            "base",
+            "darker",
+            "darkest",
+            "complement",
+            "accent"
+          ],
+          "default": "complement",
+          "prefixed": true
+        },
+        "img-src": {
+          "title": "Img-src",
+          "type": "string",
+          "prefixed": true
+        }
+      }
+    },
+    "events": {
+      "title": "Events",
+      "description": "Definition of the supported events",
+      "type": "object",
+      "properties": {
+        "slide": {
+          "title": "Slide",
+          "type": "string",
+          "default": "pfe-carousel:slide"
+        }
+      }
+    }
+  },
+  "required": ["slots", "attributes", "events"],
+  "additionalProperties": false
+}

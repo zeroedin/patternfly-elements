@@ -1,0 +1,165 @@
+// Please see the pfe-sass README for guidance on using these tools
+@import "../../pfe-sass/pfe-sass";
+
+
+$LOCAL: carousel-slide;
+$LOCAL-VARIABLES: ();
+
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background-color: transparent;
+
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  &[data-background-fixed] {
+      background-attachment: fixed;
+  }
+  &[data-background-align="right-center"] {
+      background-position: right center;
+  }
+  &[data-background-align="left-center"] {
+      background-position: left center;
+  }
+  &[data-background-align="top-center"] {
+      background-position: top center;
+  }
+  &[data-background-align="repeat"] {
+      background-position: left top;
+      background-repeat: repeat;
+      background-size: inherit;
+  }
+  &[data-bg-align="top-right"] {
+      background-position: top right;
+      background-size: contain;
+  }
+  &[data-bg-align="top-left"] {
+      background-position: top left;
+      background-size: contain;
+  }
+  &[data-bg-align="bottom-right"] {
+      background-position: bottom right;
+      background-size: contain;
+  }
+  &[data-bg-align="bottom-left"] {
+      background-position: bottom left;
+      background-size: contain;
+  }
+  
+  @media print {
+    background-color: white !important;
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+
+  margin-bottom: 0 !important;
+  overflow-y: auto;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+//-- Custom styles applied by attributes
+// @each $option in () {
+//   :host([pfe-color="#{$option}"]) {
+//     // Add styles here
+//   }
+// }
+
+// @each $option in () {
+//   :host([pfe-img-src="#{$option}"]) {
+//     // Add styles here
+//   }
+// }
+
+
+  
+.pfe-carousel-slide__container {
+  padding: $box-padding $mobile-edge;
+  width: 100%;
+  margin: 0 auto;
+  [data-eq-pts~="xxs"] & {
+      // 0
+      padding-left: #{$box-padding * 2};
+      padding-right: #{$box-padding * 2};
+  }
+  [data-eq-pts~="xs"] & {
+      // 450
+      padding-left: #{$box-padding * 2.5};
+      padding-right: #{$box-padding * 2.5};
+  }
+  [data-eq-pts~="sm"] & {
+      // 768
+      padding-left: #{$box-padding * 3};
+      padding-right: #{$box-padding * 3};
+  }
+  [data-eq-pts~="md"] & {
+      // 992
+      padding-left: #{$box-padding * 3.5};
+      padding-right: #{$box-padding * 3.5};
+  }
+
+  @media screen and (min-width: $breakpoint-sm-min) {
+      //768
+      max-width: $max-width-sm;
+  }
+  @media screen and (min-width: $breakpoint-md-min) {
+      //992
+      max-width: $max-width-md;
+  }
+  @media screen and (min-width: $breakpoint-lg-min) {
+      //1200
+      max-width: $max-width-lg;
+  }
+
+  [data-#{$repo}-slide-count="1"] & {
+      [data-eq-pts~="xxs"] & {
+          // 0
+          padding-left: $mobile-edge;
+          padding-right: $mobile-edge;
+      }
+      // Wrapped in breakpoint to override padding on full bands
+      @media screen and (min-width: $breakpoint-sm-min) {
+          [data-eq-pts~="xxs"] & {
+              // 0
+              padding-left: $box-padding;
+              padding-right: $box-padding;
+          }
+          [data-eq-pts~="sm"] & {
+              // 768
+              padding-left: 0;
+              padding-right: 0;
+          }
+      }
+      // Wrapped in breakpoint to override padding on full bands
+      @media screen and (min-width: $breakpoint-md-min) {
+          [data-eq-pts~="sm"] & {
+              // 768
+              padding-left: $box-padding;
+              padding-right: $box-padding;
+          }
+          [data-eq-pts~="md"] & {
+              // 992
+              padding-left: 0;
+              padding-right: 0;
+          }
+      }
+      // Wrapped in breakpoint to override padding on full bands
+      @media screen and (min-width: $breakpoint-lg-min) {
+          [data-eq-pts~="md"] & {
+              // 992
+              padding-left: $box-padding;
+              padding-right: $box-padding;
+          }
+          [data-eq-pts~="lg"] & {
+              // 1200
+              padding-left: 0;
+              padding-right: 0;
+          }
+      }
+  }
+}

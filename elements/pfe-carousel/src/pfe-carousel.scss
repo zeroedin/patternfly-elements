@@ -1,0 +1,30 @@
+// Please see the pfe-sass README for guidance on using these tools
+@import "../../pfe-sass/pfe-sass";
+
+
+$LOCAL: carousel;
+
+:host {
+  // Example local variable, using BEM format
+  // --pfe-carousel--Property: value;
+
+  display: block;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+//-- Custom styles applied by attributes
+// @each $option in () {
+//   :host([pfe-color="#{$option}"]) {
+//     // Add styles here
+//   }
+// }
+
+// @each $option in () {
+//   :host([pfe-img-src="#{$option}"]) {
+//     // Add styles here
+//   }
+// }
+

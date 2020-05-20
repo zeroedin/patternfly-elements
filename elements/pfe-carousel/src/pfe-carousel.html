@@ -1,0 +1,20 @@
+<!-- 
+{% set eq_obj = {
+    eq_override: true,
+    eq_custom: "xxs: 0, xs: 450, sm: 768, md: 992, lg: 1200"
+} %}
+
+{% if overlay is not empty -%}
+    data-rh-overlay="{{ "dark" in theme ? "rich-black" : "white" }}-{{ overlay|replace({"%": ""}) }}"
+{%- endif -%}
+-->
+
+<section class="pfe-carousel--layout">
+    <div class="pfe-carousel-navigation" aria-label="carousel buttons" aria-controls="carousel">
+        <button class="pfe-carousel-previous" value="previous" aria-label="previous" tabindex="0">Previous</button>
+        <button class="pfe-carousel-next" value="next" aria-label="next" tabindex="0">Next</button>
+    </div>
+    <div class="pfe-carousel-body" pfe-slide-count="{{ body.content|length }}">
+        <slot></slot>
+    </div>
+</section>
