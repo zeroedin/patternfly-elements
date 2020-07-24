@@ -196,42 +196,42 @@ $LOCAL-VARIABLES: map-deep-merge($LOCAL-VARIABLES, (
       --pfe-broadcasted--#{$prop}: #{pfe-local(Color, $region: tray)};
     }
 
-    $accordion: pfe-accordion-variables;
-    @include pfe-print-local($accordion);
-    @include pfe-trigger;
+    // $accordion: pfe-accordion-variables;
+    // @include pfe-print-local($accordion);
+    // @include pfe-trigger;
 
     box-sizing: border-box;
     align-items: stretch;
   }
 
-  :host([is_nested].expanded:not([parent_hidden])) & {
-    $accordion: pfe-accordion-variables($state: expanded);
-    @include pfe-print-local($accordion);
-  }
+  // :host([is_nested].expanded:not([parent_hidden])) & {
+  //   $accordion: pfe-accordion-variables($state: expanded);
+  //   @include pfe-print-local($accordion);
+  // }
 
-  :host([is_nested][last]:not(.expanded):not([parent_hidden])) & {
-    @include pfe-trigger-last;
-  }
+  // :host([is_nested][last]:not(.expanded):not([parent_hidden])) & {
+  //   @include pfe-trigger-last;
+  // }
 
   // Chevron styles for the navigation accordion on mobile
-  &::after {
-    // closed:
-    :host([is_nested]:not(.expanded):not([parent_hidden])) & {
-      @include pfe-chevron($state: closed, $offset: 0px);
-    }
-    // open:
-    :host([is_nested].expanded:not([parent_hidden])) & {
-      @include pfe-chevron($state: open, $offset: 4px);
-    }
-    :host([is_nested]:not([parent_hidden])) & {
-      --pfe-navigation__trigger-icon--Visible: visible;
-      border-color: pfe-local(Color);
-    }
+  // &::after {
+  //   // closed:
+  //   :host([is_nested]:not(.expanded):not([parent_hidden])) & {
+  //     @include pfe-chevron($state: closed, $offset: 0px);
+  //   }
+  //   // open:
+  //   :host([is_nested].expanded:not([parent_hidden])) & {
+  //     @include pfe-chevron($state: open, $offset: 4px);
+  //   }
+  //   :host([is_nested]:not([parent_hidden])) & {
+  //     --pfe-navigation__trigger-icon--Visible: visible;
+  //     border-color: pfe-local(Color);
+  //   }
 
-    :host([is_nested]:not([has_tray]):not([parent_hidden])) & {
-      transform: rotate(-45deg);
-    }
-  }
+  //   :host([is_nested]:not([has_tray]):not([parent_hidden])) & {
+  //     transform: rotate(-45deg);
+  //   }
+  // }
 
   // The wind variant is used to render an icon with text inline, direct links
   :host([variant="wind"]) & {
@@ -321,21 +321,21 @@ $LOCAL-VARIABLES: map-deep-merge($LOCAL-VARIABLES, (
   }
 
   //  Styles for the nested elements
-  :host([is_nested]:not([parent_hidden])) & {
-    @include pfe-collapsible($state: closed);
-    @include pfe-accordion-props;
-    @include pfe-box-sizing;
-    @include pfe-panel-container;
-     //mobile tray padding
-    padding: calc(#{pfe-local(Padding--vertical)} / 2)  calc(#{pfe-local(Padding--horizontal)} * 1.75);
-  }
+  // :host([is_nested]:not([parent_hidden])) & {
+  //   @include pfe-collapsible($state: closed);
+  //   @include pfe-accordion-props;
+  //   @include pfe-box-sizing;
+  //   @include pfe-panel-container;
+  //    //mobile tray padding
+  //   padding: calc(#{pfe-local(Padding--vertical)} / 2)  calc(#{pfe-local(Padding--horizontal)} * 1.75);
+  // }
 
-  :host([is_nested].expanded:not([parent_hidden])) & {
-    $accordion: pfe-accordion-variables($state: expanded);
-    @include pfe-print-local($accordion);
-    @include pfe-panel-variables;
-    @include pfe-collapsible($state: open);
-  }
+  // :host([is_nested].expanded:not([parent_hidden])) & {
+  //   $accordion: pfe-accordion-variables($state: expanded);
+  //   @include pfe-print-local($accordion);
+  //   @include pfe-panel-variables;
+  //   @include pfe-collapsible($state: open);
+  // }
 }
 
 ::slotted([slot="tray"]) {
@@ -361,13 +361,13 @@ $LOCAL-VARIABLES: map-deep-merge($LOCAL-VARIABLES, (
 }
 
 // Left-align text in accordions on mobile.
-:host([is_nested]) ::slotted([slot="trigger"]) {
-  text-align: left;
-}
+// :host([is_nested]) ::slotted([slot="trigger"]) {
+//   text-align: left;
+// }
 
-:host([is_nested]) [slot="trigger"] > a {
-  color: pfe-var(ui-complement) !important;
-}
+// :host([is_nested]) [slot="trigger"] > a {
+//   color: pfe-var(ui-complement) !important;
+// }
 
 :host([pfe-icon=web-mobile-menu]) {
   align-items: flex-end;
