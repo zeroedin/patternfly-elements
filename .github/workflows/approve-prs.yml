@@ -1,0 +1,22 @@
+# This workflow will approve a pull requests opened by the dependabot
+# if the tests have passed
+name: Approve pull requests if requirements are met
+
+on:
+  pull_request:
+    types:
+      - opened
+      - convert_to_draft
+      - ready_for_review
+
+env:
+  TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+# Separate jobs can run concurrently
+jobs:
+  steps:
+    - name: Approve Pull Request
+      uses: juliangruber/approve-pull-request-action@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        number: 1

@@ -113,7 +113,7 @@ suite("<pfe-card>", () => {
   test("it should upgrade", () => {
     assert.instanceOf(
       document.querySelector("pfe-card"),
-      customElements.get("pfe-card"),
+      customElements.get("pfe-foo"),
       "the <pfe-card> should be an instance of PfeCard"
     );
   });

@@ -150,7 +150,38 @@ jobs:
         run: npm run build
 
       - name: Run tests
-        run: npm test -- --build=false --verbose
+        run: npm test -- --skip-build --verbose
+
+      - name: Add passing label if tests passed
+        if: success()
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ env.GITHUB_TOKEN }}
+          labels: AT passed
+
+      - name: Remove passing label if tests failed
+        if: failure()
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          github_token: ${{ env.GITHUB_TOKEN }}
+          labels: AT passed
+
+      - name: Publish results
+        uses: EnricoMi/publish-unit-test-result-action@v1.7
+        if: always()
+        with:
+          github_token: ${{ env.GITHUB_TOKEN }}
+          files: test/wct-results.xml
+
+      # - name: Comment if tests fail
+      #   if: failure()
+      #   uses: mshick/add-pr-comment@v1
+      #   with:
+      #     message: |
+      #       The following tests failed:
+      #     repo-token: ${{ env.GITHUB_TOKEN }}
+      #     repo-token-user-login: "github-actions[bot]" # The user.login for temporary GitHub tokens
+      #     allow-repeats: true
 
   # E2E command can run concurrent with test so it downloads the
   # compiled assets from the build and uses those instead of reinstalling.

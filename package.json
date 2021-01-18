@@ -15,16 +15,17 @@
   "scripts": {
     "start": "spandx",
     "lerna": "lerna",
-    "test": "bash scripts/test.sh",
+    "test": "node scripts/test.js",
     "dev": "bash scripts/dev.sh",
     "watch": "bash scripts/watch.sh",
     "prebuild": "npm run doc-listing-inject",
     "build": "bash scripts/build.sh",
     "clean": "rm -rf node_modules package-lock.json elements/*/{node_modules,package-lock.json,_temp} test/vrt-snapshots",
     "bootstrap": "lerna bootstrap --hoist",
+    "copy:assets": "rm -rf examples/node_modules && mkdir examples/node_modules && cp -r node_modules/@webcomponents node_modules/requirejs examples/node_modules/",
     "deploy-docs": "bash scripts/deploy-docs.sh",
     "release": "bash scripts/release.sh",
-    "postinstall": "npm run bootstrap",
+    "postinstall": "npm run bootstrap && npm run copy:assets",
     "test-suite-inject": "node scripts/test-suite-inject.js",
     "doc-listing-inject": "npm run leftover-check && node scripts/doc-listing-inject.js",
     "license-update": "node scripts/license-update.js",
@@ -38,7 +39,7 @@
     "demo": "bash scripts/demo.sh",
     "live-demo": "bash scripts/demo.sh --watch",
     "pr": "node scripts/open-pr.js",
-    "e2e": "wdio wdio.conf.js"
+    "e2e": "wdio ./test/wdio.conf.js"
   },
   "husky": {
     "hooks": {
@@ -142,9 +143,11 @@
     "util": "^0.12.1",
     "vue": "^2.6.11",
     "wct-browser-legacy": "^1.0.2",
+    "wct-xunit-reporter": "^1.0.2",
     "wdio-image-comparison-service": "^1.14.0",
     "web-component-tester": "^6.9.2",
     "whatwg-fetch": "^3.0.0",
+    "xunit-viewer": "^7.0.1",
     "yargs": "^16.0.3",
     "yeoman-generator": "^4.4.0",
     "yo": "^1.8.5",

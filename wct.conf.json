@@ -9,6 +9,9 @@
         "chrome": ["headless", "disable-gpu", "no-sandbox"],
         "firefox": ["-headless"]
       }
+    },
+    "xunit-reporter": {
+      "output": "test/wct-results.xml"
     }
   }
 }

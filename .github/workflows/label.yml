@@ -36,6 +36,7 @@ jobs:
         # Add a ready to merge label if the PR is approved and the test suite has passed
         if: |
           !contains(github.event.pull_request.labels.*.name, 'on hold') &&
+          !contains(github.event.pull_request.labels.*.name, 'blocked') &&
           !contains(github.event.pull_request.labels.*.name, 'work in progress') &&
           github.event.review.state == 'approved'
         uses: actions-ecosystem/action-add-labels@v1
@@ -49,7 +50,10 @@ jobs:
 
     steps:
       - name: Flag work in progress
-        if: github.event.pull_request.draft == true
+        if: |
+          github.event.pull_request.draft == true ||
+          contains(github.event.pull_request.labels.*.name, 'needs: code updates') ||
+          contains(github.event.pull_request.labels.*.name, 'needs: AT updates')
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ env.TOKEN }}
