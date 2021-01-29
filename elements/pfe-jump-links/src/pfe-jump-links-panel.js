@@ -281,7 +281,7 @@ class PfeJumpLinksPanel extends PFElement {
 
   _scrollCallback() {
     let isScrollingDown = true;
-    if (this.scrollPosition < window.scrollY) isScrollingDown = false;
+    if (this.scrollPosition > window.scrollY) isScrollingDown = false;
 
     // Update the scroll position
     this.scrollPosition = window.scrollY;
@@ -294,26 +294,16 @@ class PfeJumpLinksPanel extends PFElement {
       const section = this.sections.item(index);
       const nextSection = this.sections.item(index + 1);
 
-      let positionTop = parseInt(section.getBoundingClientRect().top) - this.offsetValue;
+      let positionTop = section.offsetTop - this.offsetValue;
       let positionBottom = 0;
 
       if (nextSection) {
-        positionBottom = parseInt(nextSection.getBoundingClientRect().top) - this.offsetValue;
-        console.log({ bottomOfScreen: window.innerHeight, topOfNext: positionBottom });
+        positionBottom = nextSection.offsetTop - this.offsetValue;
       } else {
-        positionBottom = parseInt(this.getBoundingClientRect().bottom);
-        console.log({ id: section.id, bottomOfScreen: window.innerHeight, bottomOfPanel: positionBottom });
+        positionBottom = this.offsetTop + this.offsetHeight;
       }
 
-      // console.dir(section);
-      // console.table({ positionTop, positionBottom });
-      // Scrolling down:
-      // -- the top position of the viewport + the offset is where the top of the section should start
-      // Scrolling up:
-      if (
-        (isScrollingDown && 0 <= positionTop && window.innerHeight > positionBottom) ||
-        (!isScrollingDown && 0 <= positionBottom && window.innerHeight > positionTop)
-      ) {
+      if (this.scrollPosition >= positionTop && this.scrollPosition <= positionBottom) {
         matches.push(section);
         ids.push(section.id);
         // If this is a new element, flag this as changed
