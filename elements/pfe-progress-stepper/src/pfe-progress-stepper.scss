@@ -11,7 +11,11 @@ $LOCAL: progress-stepper;
 $LOCAL-VARIABLES: (
   item: (
     Width: 50px
-  )
+  ),
+  progress-bar: (
+    Color: #D2D2D2,
+    Fill: #06c,
+  ),
 );
 
 :host {
@@ -40,13 +44,14 @@ $LOCAL-VARIABLES: (
     position: absolute;
     height: 2px;
     width: calc(100% - var(--pfe-progress-stepper__item--Width, 50px));
-    background: #D2D2D2 0% 0% no-repeat padding-box;
+    background-color: pfe-local(Color, $region: progress-bar);
     left: 50%;
     transform: translateX(-50%);
   }
   &__progress-bar-fill {
     display: block;
     height: 2px;
-    background: #06c;
+    background: pfe-local(Fill, $region: progress-bar);
+    width: 0;
   }
 }

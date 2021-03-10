@@ -53,7 +53,8 @@ class PfeProgressStepper extends PFElement {
   _build() {
     const stepperItems = [...this.querySelectorAll("pfe-progress-stepper-item")];
     // find what child item has the active state
-    const activeItemIndex = stepperItems.findIndex(element => element.getAttribute("state") === "current");
+    const activeItemIndex = stepperItems.findIndex(element => element.hasAttribute("current"));
+    console.log(activeItemIndex);
     if (activeItemIndex >= 0) {
       // Calculate the width of the progress bar.
       const width = (activeItemIndex / (stepperItems.length - 1)) * 100 + "%";
