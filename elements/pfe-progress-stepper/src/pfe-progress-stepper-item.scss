@@ -17,6 +17,7 @@ $LOCAL-VARIABLES: (
     Color: #06c,
     BackgroundColor: white
   ),
+  spacer: 8px, // --pf-global--spacer--sm
 );
 
 :host {
@@ -45,6 +46,7 @@ $LOCAL-VARIABLES: (
     width: 32px;
     height: 32px;
     margin: auto;
+    margin-bottom: pfe-local(spacer);
   }
   &__circle--inner {
     display: block;
