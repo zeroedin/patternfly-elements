@@ -98,15 +98,21 @@ $LOCAL-VARIABLES: (
     font-size: 16px;
     color: var(--pfe-progress-stepper-item__title--color, #151515);
   }
-  &__description,
-  &__description slot::slotted(*) {
+  &__description {
     color: var(--pfe-progress-stepper-item__description--color, #6A6E73);
     font-size: 14px;
     text-align: center;
+    margin-top: 7px;
   }
   &__spacer {
     width: auto;
     margin: calc(#{pfe-local(spacer)} / 2);
+  }
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -154,5 +160,20 @@ $LOCAL-VARIABLES: (
 :host([vertical]) {
   .pfe-progress-stepper-item {
     flex-direction: row;
+    align-items: flex-start;
+
+    &__circle-wrapper {
+      // we need to get rid of the margin to make the circle raise to
+      // the top of the vertical container
+      margin: 0;
+    }
+
+    &__description {
+      // @todo handle this betterremove the margin top
+      margin-top: 0;
+    }
+    &__content {
+      align-items: flex-start;
+    }
   }
 }

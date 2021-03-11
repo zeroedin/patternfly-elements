@@ -74,7 +74,8 @@ $LOCAL-VARIABLES: (
       top: calc(var(--pfe-progress-stepper-item__circle--Size) / 2);
       left: calc(var(--pfe-progress-stepper-item__circle--Size) / 2);
       width: var(--pfe-progress-stepper__progress-bar--Width, 2px);
-      height: calc(100% - (var(--pfe-progress-stepper-item__circle--Size)));
+      // @todo: this is a hack. trying to guess
+      height: calc(100% - var(--pfe-progress-stepper-item__circle--Size) * 1.3);
     }
     &__progress-bar-fill {
       width: var(--pfe-progress-stepper__progress-bar--Width, 2px);

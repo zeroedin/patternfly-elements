@@ -66,6 +66,14 @@ class PfeProgressStepper extends PFElement {
         this.shadowRoot.querySelector(".pfe-progress-stepper__progress-bar-fill").style.width = width;
       }
     }
+    // Add spacing to the each of the items except for the top item
+    // @todo we have to do it in javascript until everyone supports
+    // targeting siblings in :slotted. i.e. slot:slotted(pfe-progress-stepper-item + pfe-progress-stepper-item) { margin-top }
+    stepperItems.forEach((item, index) => {
+      if (index === stepperItems.length - 1) return;
+      // @todo this needs to bee dynamic
+      item.style.minHeight = "100px";
+    });
   }
 }
 
