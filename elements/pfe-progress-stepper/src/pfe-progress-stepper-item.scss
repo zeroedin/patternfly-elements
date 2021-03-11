@@ -47,6 +47,18 @@ $LOCAL-VARIABLES: (
     height: 32px;
     margin: auto;
     margin-bottom: pfe-local(spacer);
+    position: relative;
+
+    &:before {
+      display: block;
+      content: "";
+      background: white;
+      height: 100%;
+      position: absolute;
+      width: 100%;
+      top: 50%;
+      z-index: 0;
+    }
   }
   &__circle--inner {
     display: block;
@@ -59,6 +71,7 @@ $LOCAL-VARIABLES: (
     transform: translate(-50%, -50%);
     top: 50%;
     left: 50%;
+    z-index: 1;
   }
   &__circle--outer {
     display: none;
@@ -71,6 +84,7 @@ $LOCAL-VARIABLES: (
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 1;
   }
   &__circle--icon {
     height: 20px;

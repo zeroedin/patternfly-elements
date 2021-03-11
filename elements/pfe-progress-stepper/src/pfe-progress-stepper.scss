@@ -40,7 +40,7 @@ $LOCAL-VARIABLES: (
 
   &__progress-bar {
     top: 15px;
-    display: block;
+    display: flex;
     position: absolute;
     height: 2px;
     width: calc(100% - var(--pfe-progress-stepper__item--Width, 50px));
@@ -53,5 +53,22 @@ $LOCAL-VARIABLES: (
     height: 2px;
     background: pfe-local(Fill, $region: progress-bar);
     width: 0;
+  }
+}
+
+:host([vertical]) {
+  & .pfe-progress-stepper {
+    flex-direction: column;
+
+    &__progress-bar {
+      top: calc(var(--pfe-progress-stepper__item--Width, 50px) / 2);
+      left: calc(var(--pfe-progress-stepper__item--Width, 50px) / 2);
+      width: 2px;
+      height: calc(100% - (var(--pfe-progress-stepper__item--Width, 50px)));
+    }
+    &__progress-bar-fill {
+      width: 2px;
+      height: 0;
+    }
   }
 }

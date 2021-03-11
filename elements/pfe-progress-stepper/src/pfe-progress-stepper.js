@@ -32,7 +32,9 @@ class PfeProgressStepper extends PFElement {
   }
 
   static get properties() {
-    return {};
+    return {
+      vertical: { type: Boolean, default: false }
+    };
   }
 
   static get slots() {
@@ -54,11 +56,16 @@ class PfeProgressStepper extends PFElement {
     const stepperItems = [...this.querySelectorAll("pfe-progress-stepper-item")];
     // find what child item has the active state
     const activeItemIndex = stepperItems.findIndex(element => element.hasAttribute("current"));
-    console.log(activeItemIndex);
     if (activeItemIndex >= 0) {
       // Calculate the width of the progress bar.
       const width = (activeItemIndex / (stepperItems.length - 1)) * 100 + "%";
-      this.shadowRoot.querySelector(".pfe-progress-stepper__progress-bar-fill").style.width = width;
+      if (this.vertical) {
+        console.log(width);
+        this.shadowRoot.querySelector(".pfe-progress-stepper__progress-bar-fill").style.height = width;
+      }
+      else {
+        this.shadowRoot.querySelector(".pfe-progress-stepper__progress-bar-fill").style.width = width;
+      }
     }
   }
 }

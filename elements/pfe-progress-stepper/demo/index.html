@@ -176,7 +176,7 @@
       <pfe-progress-stepper-item state="done">
         <div slot="title">Done</div>
       </pfe-progress-stepper-item>
-      <pfe-progress-stepper-item state="current" current>
+      <pfe-progress-stepper-item state="active" current>
         <div slot="title">Current</div>
       </pfe-progress-stepper-item>
     </pfe-progress-stepper>
@@ -192,7 +192,69 @@
         <div slot="title">Error</div>
       </pfe-progress-stepper-item>
     </pfe-progress-stepper>
+  </div>
 
+  <div class="vertical">
+    <h2><code>pfe-progress-stepper custom style</code></h2>
+    <pfe-progress-stepper vertical>
+      <pfe-progress-stepper-item state="active" current>
+        <div slot="title">Current</div>
+      </pfe-progress-stepper-item>
+      <pfe-progress-stepper-item>
+        <div slot="title">Next</div>
+      </pfe-progress-stepper-item>
+      <pfe-progress-stepper-item>
+        <div slot="title">Last</div>
+      </pfe-progress-stepper-item>
+    </pfe-progress-stepper>
+
+    <pfe-progress-stepper vertical>
+      <pfe-progress-stepper-item state="done">
+        <div slot="title">Done</div>
+      </pfe-progress-stepper-item>
+      <pfe-progress-stepper-item state="active" current>
+        <div slot="title">Current</div>
+      </pfe-progress-stepper-item>
+      <pfe-progress-stepper-item>
+        <div slot="title">Last</div>
+      </pfe-progress-stepper-item>
+    </pfe-progress-stepper>
+
+    <pfe-progress-stepper vertical>
+      <pfe-progress-stepper-item state="done">
+        <div slot="title">Done</div>
+      </pfe-progress-stepper-item>
+      <pfe-progress-stepper-item state="error" current>
+        <div slot="title">Error</div>
+      </pfe-progress-stepper-item>
+      <pfe-progress-stepper-item>
+        <div slot="title">Last</div>
+      </pfe-progress-stepper-item>
+    </pfe-progress-stepper>
+
+    <pfe-progress-stepper vertical>
+      <pfe-progress-stepper-item state="done">
+        <div slot="title">Done</div>
+      </pfe-progress-stepper-item>
+      <pfe-progress-stepper-item state="done">
+        <div slot="title">Done</div>
+      </pfe-progress-stepper-item>
+      <pfe-progress-stepper-item state="active" current>
+        <div slot="title">Current</div>
+      </pfe-progress-stepper-item>
+    </pfe-progress-stepper>
+
+    <pfe-progress-stepper vertical>
+      <pfe-progress-stepper-item state="done">
+        <div slot="title">Done</div>
+      </pfe-progress-stepper-item>
+      <pfe-progress-stepper-item state="done">
+        <div slot="title">done</div>
+      </pfe-progress-stepper-item>
+      <pfe-progress-stepper-item state="error" current>
+        <div slot="title">Error</div>
+      </pfe-progress-stepper-item>
+    </pfe-progress-stepper>
   </div>
 
 </body>
