@@ -96,6 +96,13 @@ $LOCAL-VARIABLES: (
   &__title,
   &__title slot::slotted(*) {
     font-size: 16px;
+    color: var(--pfe-progress-stepper-item__title--color, #151515);
+  }
+  &__description,
+  &__description slot::slotted(*) {
+    color: var(--pfe-progress-stepper-item__description--color, #6A6E73);
+    font-size: 14px;
+    text-align: center;
   }
   &__spacer {
     width: auto;
@@ -132,6 +139,8 @@ $LOCAL-VARIABLES: (
 
 :host([state="error"]) {
   .pfe-progress-stepper-item {
+    --pfe-progress-stepper-item__title--color: #C9190B;
+    --pfe-progress-stepper-item__description--color: #C9190B;
     &__circle--inner {
       display: none;
     }
