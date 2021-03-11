@@ -22,9 +22,9 @@ $LOCAL-VARIABLES: (
   // Avoid printing local variables on host, instead use the pfe-local() function to set property values
   // Example: color: pfe-local(Color);
   display: block;
-  // @todo: is there a helper function to print the local variable here?
-  // I.e. I should be printing 50px.
-  --pfe-progress-stepper-item--Width: var(--pfe-progress-stepper__item--Width, 50px);
+  // We have to set the size of the circle size here so our vertical progress bar knows how much
+  // offset to do.
+  --pfe-progress-stepper-item__circle--Size: var(--pfe-progress-stepper__circle--Size, 32px);
 }
 
 :host([hidden]) {
@@ -56,18 +56,28 @@ $LOCAL-VARIABLES: (
   }
 }
 
+:host(:not([vertical])) {
+  // Set the widths on each item the same so that the progress bar
+  // works correctly.
+  // @todo: is there a helper function to print the local variable here?
+  // I.e. I should be printing 50px.
+  --pfe-progress-stepper-item--Width: var(--pfe-progress-stepper__item--Width, 50px);
+}
+
 :host([vertical]) {
   & .pfe-progress-stepper {
+    // Make everything vertical
     flex-direction: column;
 
     &__progress-bar {
-      top: calc(var(--pfe-progress-stepper__item--Width, 50px) / 2);
-      left: calc(var(--pfe-progress-stepper__item--Width, 50px) / 2);
-      width: 2px;
-      height: calc(100% - (var(--pfe-progress-stepper__item--Width, 50px)));
+      // Position the progress bar correctly over the circle
+      top: calc(var(--pfe-progress-stepper-item__circle--Size) / 2);
+      left: calc(var(--pfe-progress-stepper-item__circle--Size) / 2);
+      width: var(--pfe-progress-stepper__progress-bar--Width, 2px);
+      height: calc(100% - (var(--pfe-progress-stepper-item__circle--Size)));
     }
     &__progress-bar-fill {
-      width: 2px;
+      width: var(--pfe-progress-stepper__progress-bar--Width, 2px);
       height: 0;
     }
   }

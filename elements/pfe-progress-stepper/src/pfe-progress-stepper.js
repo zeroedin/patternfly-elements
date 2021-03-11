@@ -33,7 +33,7 @@ class PfeProgressStepper extends PFElement {
 
   static get properties() {
     return {
-      vertical: { type: Boolean, default: false }
+      vertical: { type: Boolean, default: false, cascade: ["pfe-progress-stepper-item"] }
     };
   }
 
@@ -62,8 +62,7 @@ class PfeProgressStepper extends PFElement {
       if (this.vertical) {
         console.log(width);
         this.shadowRoot.querySelector(".pfe-progress-stepper__progress-bar-fill").style.height = width;
-      }
-      else {
+      } else {
         this.shadowRoot.querySelector(".pfe-progress-stepper__progress-bar-fill").style.width = width;
       }
     }

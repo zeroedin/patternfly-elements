@@ -14,6 +14,7 @@ $LOCAL-VARIABLES: (
   // the line is calculated properly.
   Width: auto,
   circle: (
+    Size: 32px,
     Color: #06c,
     BackgroundColor: white
   ),
@@ -23,13 +24,7 @@ $LOCAL-VARIABLES: (
 :host {
   // Avoid printing local variables on host, instead use the pfe-local() function to set property values
   // Example: color: pfe-local(Color);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #151515;
-  font-size: 16px;
-  width: pfe-local(Width);
+  display: block;
 }
 
 :host([hidden]) {
@@ -37,28 +32,31 @@ $LOCAL-VARIABLES: (
 }
 
 .pfe-progress-stepper-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #151515;
+  font-size: 16px;
+  // This is important so the .pfe-progress-stepper
+  // can dynamically set the width of the items in horizontal
+  // layout. If this isn't set then the items are unable
+  // to line up correctly.
+  width: pfe-local(Width);
+
   &__circle-wrapper {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
+    // Example Stack
     width: 32px;
+    width: var(--pfe-#{$LOCAL}__circle-wrapper--Width, var(--pfe-#{$LOCAL}__circle--Width, var(--pfe-#{$LOCAL}__circle--Size, 32px)));
     height: 32px;
+    height: var(--pfe-#{$LOCAL}__circle-wrapper--Height, var(--pfe-#{$LOCAL}__circle--Height, var(--pfe-#{$LOCAL}__circle--Size, 32px)));
     margin: auto;
-    margin-bottom: pfe-local(spacer);
     position: relative;
-
-    &:before {
-      display: block;
-      content: "";
-      background: white;
-      height: 100%;
-      position: absolute;
-      width: 100%;
-      top: 50%;
-      z-index: 0;
-    }
   }
   &__circle--inner {
     display: block;
@@ -66,8 +64,10 @@ $LOCAL-VARIABLES: (
     content: "";
     border-radius: 50%;
     border: 2px solid #D2D2D2;
-    height: 15px;
-    width: 15px;
+    width: 32px;
+    width: calc( var(--pfe-#{$LOCAL}__circle-inner--Width, var(--pfe-#{$LOCAL}__circle--Width, var(--pfe-#{$LOCAL}__circle--Size, 32px))) / 2);
+    height: 32px;
+    height: calc( var(--pfe-#{$LOCAL}__circle-inner--Height, var(--pfe-#{$LOCAL}__circle--Height, var(--pfe-#{$LOCAL}__circle--Size, 32px))) / 2);
     transform: translate(-50%, -50%);
     top: 50%;
     left: 50%;
@@ -79,8 +79,10 @@ $LOCAL-VARIABLES: (
     content: "";
     border-radius: 50%;
     opacity: 0.15;
-    height: 32px;
     width: 32px;
+    width: var(--pfe-#{$LOCAL}__circle-outer--Width, var(--pfe-#{$LOCAL}__circle--Width, var(--pfe-#{$LOCAL}__circle--Size, 32px)));
+    height: 32px;
+    height: var(--pfe-#{$LOCAL}__circle-outer--Height, var(--pfe-#{$LOCAL}__circle--Height, var(--pfe-#{$LOCAL}__circle--Size, 32px)));
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -94,6 +96,10 @@ $LOCAL-VARIABLES: (
   &__title,
   &__title slot::slotted(*) {
     font-size: 16px;
+  }
+  &__spacer {
+    width: auto;
+    margin: calc(#{pfe-local(spacer)} / 2);
   }
 }
 
@@ -133,5 +139,11 @@ $LOCAL-VARIABLES: (
       display: block;
       --pf-global--danger-color--100: #C9190B;
     }
+  }
+}
+
+:host([vertical]) {
+  .pfe-progress-stepper-item {
+    flex-direction: row;
   }
 }
