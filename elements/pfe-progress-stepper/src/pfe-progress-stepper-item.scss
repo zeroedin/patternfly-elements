@@ -65,10 +65,11 @@ $LOCAL-VARIABLES: (
     border-radius: 50%;
     border: 2px solid #D2D2D2;
     width: 32px;
-    width: calc( var(--pfe-#{$LOCAL}__circle-inner--Width, var(--pfe-#{$LOCAL}__circle--Width, var(--pfe-#{$LOCAL}__circle--Size, 32px))) / 2);
+    width: calc( var(--pfe-#{$LOCAL}__circle-inner--Width, var(--pfe-#{$LOCAL}__circle--Width, var(--pfe-#{$LOCAL}__circle--Size, 32px))) / 2.2);
     height: 32px;
-    height: calc( var(--pfe-#{$LOCAL}__circle-inner--Height, var(--pfe-#{$LOCAL}__circle--Height, var(--pfe-#{$LOCAL}__circle--Size, 32px))) / 2);
+    height: calc( var(--pfe-#{$LOCAL}__circle-inner--Height, var(--pfe-#{$LOCAL}__circle--Height, var(--pfe-#{$LOCAL}__circle--Size, 32px))) / 2.2);
     transform: translate(-50%, -50%);
+    background: white;
     top: 50%;
     left: 50%;
     z-index: 1;
@@ -96,13 +97,12 @@ $LOCAL-VARIABLES: (
   &__title,
   &__title slot::slotted(*) {
     font-size: 16px;
-    color: var(--pfe-progress-stepper-item__title--color, #151515);
+    color: var(--pfe-progress-stepper-item__title--Color, #151515);
   }
   &__description {
-    color: var(--pfe-progress-stepper-item__description--color, #6A6E73);
+    color: var(--pfe-progress-stepper-item__description--Color, #6A6E73);
     font-size: 14px;
     text-align: center;
-    margin-top: 7px;
   }
   &__spacer {
     width: auto;
@@ -128,6 +128,12 @@ $LOCAL-VARIABLES: (
       display: block;
       background-color: pfe-local(Color, $region: circle);
     }
+    &__title,
+    &__title slot::slotted(*) {
+      // leave with no fallback so it inherits correctly
+      color: var(--pfe-progress-stepper-item__active__title--Color, #0066CC);
+      font-weight: 500;
+    }
   }
 }
 
@@ -145,8 +151,8 @@ $LOCAL-VARIABLES: (
 
 :host([state="error"]) {
   .pfe-progress-stepper-item {
-    --pfe-progress-stepper-item__title--color: #C9190B;
-    --pfe-progress-stepper-item__description--color: #C9190B;
+    --pfe-progress-stepper-item__title--Color: #C9190B;
+    --pfe-progress-stepper-item__description--Color: #C9190B;
     &__circle--inner {
       display: none;
     }
@@ -163,15 +169,17 @@ $LOCAL-VARIABLES: (
     align-items: flex-start;
 
     &__circle-wrapper {
-      // we need to get rid of the margin to make the circle raise to
+      // we need to get rid of the margin auto to make the circle raise to
       // the top of the vertical container
       margin: 0;
     }
 
-    &__description {
-      // @todo handle this betterremove the margin top
-      margin-top: 0;
+    &__title {
+      // @todo: we are lining up the circles and the title, basically faking flexbox
+      // we should handle this in the markup or with CSS grid.
+      margin-top: var(--pfe-#{$LOCAL}__vertical__title--MarginTop, calc(var(--pfe-#{$LOCAL}__circle--Size, 32px) / 6));
     }
+
     &__content {
       align-items: flex-start;
     }

@@ -72,7 +72,7 @@ class PfeProgressStepper extends PFElement {
     stepperItems.forEach((item, index) => {
       if (index === stepperItems.length - 1) return;
       // @todo this needs to bee dynamic
-      item.style.minHeight = "100px";
+      item.style.minHeight = "75px";
     });
   }
 }
