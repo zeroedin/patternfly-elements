@@ -10,7 +10,7 @@ $LOCAL: progress-stepper;
 // This variable is global so that helper functions can reference it
 $LOCAL-VARIABLES: (
   item: (
-    Width: 50px
+    Width: 75px
   ),
   progress-bar: (
     Color: #D2D2D2,
@@ -43,7 +43,7 @@ $LOCAL-VARIABLES: (
     display: flex;
     position: absolute;
     height: 2px;
-    width: calc(100% - var(--pfe-progress-stepper__item--Width, 50px));
+    width: calc(100% - var(--pfe-progress-stepper__item--Width, 75px));
     background-color: pfe-local(Color, $region: progress-bar);
     left: 50%;
     transform: translateX(-50%);
@@ -60,8 +60,8 @@ $LOCAL-VARIABLES: (
   // Set the widths on each item the same so that the progress bar
   // works correctly.
   // @todo: is there a helper function to print the local variable here?
-  // I.e. I should be printing 50px.
-  --pfe-progress-stepper-item--Width: var(--pfe-progress-stepper__item--Width, 50px);
+  // I.e. I should be printing 75px.
+  --pfe-progress-stepper-item--Width: var(--pfe-progress-stepper__item--Width, 75px);
 }
 
 :host([vertical]) {

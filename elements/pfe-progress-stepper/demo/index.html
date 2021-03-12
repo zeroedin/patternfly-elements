@@ -55,6 +55,8 @@
       --pfe-progress-stepper__progress-bar--Fill: #6A6E73;
       --pfe-progress-stepper-item__circle--Color: #EE0000;
       --pfe-progress-stepper-item__active__title--Color: #151515;
+      --pfe-progress-stepper-item__focus__text--Color: #151515;
+      --pfe-progress-stepper-item__focus--TextDecoration: underline;
     }
   </style>
 </head>
@@ -75,12 +77,15 @@
   <pfe-progress-stepper>
     <pfe-progress-stepper-item state="active" current>
       <div slot="title">Current</div>
+      <a slot="link" href="#">View Current Step</a>
     </pfe-progress-stepper-item>
     <pfe-progress-stepper-item>
       <div slot="title">Next</div>
+      <a slot="link" href="#">View Next Step</a>
     </pfe-progress-stepper-item>
     <pfe-progress-stepper-item>
       <div slot="title">Last</div>
+      <a slot="link" href="#">View Last Step</a>
     </pfe-progress-stepper-item>
   </pfe-progress-stepper>
 
@@ -137,12 +142,15 @@
     <pfe-progress-stepper>
       <pfe-progress-stepper-item state="active" current>
         <div slot="title">Current</div>
+        <a slot="link" href="#">View Current Step</a>
       </pfe-progress-stepper-item>
       <pfe-progress-stepper-item>
         <div slot="title">Next</div>
+        <a slot="link" href="#">View Next Step</a>
       </pfe-progress-stepper-item>
       <pfe-progress-stepper-item>
         <div slot="title">Last</div>
+        <a slot="link" href="#">View Last Step</a>
       </pfe-progress-stepper-item>
     </pfe-progress-stepper>
 
@@ -197,15 +205,18 @@
 
   <div class="vertical">
     <h2><code>pfe-progress-stepper custom style</code></h2>
-    <pfe-progress-stepper vertical>
+    <pfe-progress-stepper>
       <pfe-progress-stepper-item state="active" current>
         <div slot="title">Current</div>
+        <a slot="link" href="#">View Current Step</a>
       </pfe-progress-stepper-item>
       <pfe-progress-stepper-item>
         <div slot="title">Next</div>
+        <a slot="link" href="#">View Next Step</a>
       </pfe-progress-stepper-item>
       <pfe-progress-stepper-item>
         <div slot="title">Last</div>
+        <a slot="link" href="#">View Last Step</a>
       </pfe-progress-stepper-item>
     </pfe-progress-stepper>
 

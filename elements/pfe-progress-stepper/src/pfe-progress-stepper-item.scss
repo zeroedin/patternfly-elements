@@ -19,6 +19,9 @@ $LOCAL-VARIABLES: (
     BackgroundColor: white
   ),
   spacer: 8px, // --pf-global--spacer--sm
+  hover: (
+    Color: #06c
+  )
 );
 
 :host {
@@ -116,6 +119,18 @@ $LOCAL-VARIABLES: (
   }
 }
 
+:host([hasLink]) {
+  cursor: pointer;
+}
+
+:host([hasLink]:is(:focus,:hover)) {
+  .pfe-progress-stepper-item {
+    --pfe-progress-stepper-item__title--Color: var(--pfe-progress-stepper-item__focus__text--Color, #0066CC);
+    --pfe-progress-stepper-item__description--Color: var(--pfe-progress-stepper-item__focus__text--Color, #0066CC);
+    text-decoration: var(--pfe-progress-stepper-item__focus--TextDecoration, none);
+  }
+}
+
 :host([state="active"]) {
   .pfe-progress-stepper-item {
     &__circle--inner {
@@ -167,19 +182,16 @@ $LOCAL-VARIABLES: (
   .pfe-progress-stepper-item {
     flex-direction: row;
     align-items: flex-start;
-
     &__circle-wrapper {
       // we need to get rid of the margin auto to make the circle raise to
       // the top of the vertical container
       margin: 0;
     }
-
     &__title {
       // @todo: we are lining up the circles and the title, basically faking flexbox
       // we should handle this in the markup or with CSS grid.
       margin-top: var(--pfe-#{$LOCAL}__vertical__title--MarginTop, calc(var(--pfe-#{$LOCAL}__circle--Size, 32px) / 6));
     }
-
     &__content {
       align-items: flex-start;
     }

@@ -7,7 +7,7 @@ class PfeProgressStepperItem extends PFElement {
 
   static get meta() {
     return {
-      title: "Progress stepper",
+      title: "Progress stepper item",
       description:
         "A component that gives the user a visual representation of the current state of their progress through an application (typeically a multistep form)."
     };
@@ -54,13 +54,61 @@ class PfeProgressStepperItem extends PFElement {
 
   constructor() {
     super(PfeProgressStepperItem, { type: PfeProgressStepperItem.PfeType });
+    this._hasLink = false;
+    this._linkOpenTag = " ";
+    this._linkClosingTag = " ";
   }
 
   connectedCallback() {
+    this._build();
     super.connectedCallback();
+    this.addEventListener("click", this._clickHandler.bind(this));
+    this.addEventListener("keydown", this._keydownHandler.bind(this));
   }
 
-  disconnectedCallback() {}
+  disconnectedCallback() {
+    this.removeEventListener("click", this._clickHandler.bind(this));
+    this.removeEventListener("keydown", this._keydownHandler.bind(this));
+  }
+
+  _build() {
+    // Find out if there are any links
+    const fragment = document.createElement("div");
+    const link = this.querySelector(`a[slot="link"]`);
+    if (link) {
+      // let the component know we have a link
+      this._hasLink = true;
+      this.setAttribute("hasLink", true);
+      this._link = link;
+      this.setAttribute("tabindex", "0");
+    }
+    else {
+      this._hasLink = false;
+    }
+  }
+
+  _clickHandler(event) {
+    if (this._hasLink) {
+      this._link.click();
+    }
+  }
+
+  // Listen for keyboard events and map them to their
+  // corresponding mouse events.
+  _keydownHandler(event) {
+    let key = event.key || event.keyCode;
+    switch (key) {
+      case "Enter" || 13:
+        this._clickHandler(event);
+        break;
+      case " " || 32:
+        // Prevent the browser from scolling when the user hits the space key
+        event.stopPropagation();
+        event.preventDefault();
+        this._clickHandler(event);
+        break;
+    }
+  }
 }
 
 PFElement.create(PfeProgressStepperItem);
