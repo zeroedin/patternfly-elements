@@ -54,6 +54,9 @@ $LOCAL-VARIABLES: (
     align-items: center;
     position: relative;
     // Example Stack
+    // @todo PFE philosophy is to try to keep the amount of public hooks available to a reasonable level
+    // In this case, we would only want to expose circle size as a hook.
+    // @todo use the pfe-navigation method where we use mulitple maps to reference fallback values
     width: 32px;
     width: var(--pfe-#{$LOCAL}__circle-wrapper--Width, var(--pfe-#{$LOCAL}__circle--Width, var(--pfe-#{$LOCAL}__circle--Size, 32px)));
     height: 32px;
@@ -95,7 +98,6 @@ $LOCAL-VARIABLES: (
   &__circle--icon {
     height: 20px;
     width: 20px;
-    background: white;
   }
   &__title,
   &__title slot::slotted(*) {
@@ -159,6 +161,7 @@ $LOCAL-VARIABLES: (
     }
     &__circle--icon {
       display: block;
+      background: white;
       --pf-global--success-color--100: #3E8635;
     }
   }
@@ -173,6 +176,7 @@ $LOCAL-VARIABLES: (
     }
     &__circle--icon {
       display: block;
+      background: white;
       --pf-global--danger-color--100: #C9190B;
     }
   }
