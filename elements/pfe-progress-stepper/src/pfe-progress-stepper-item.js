@@ -44,7 +44,8 @@ class PfeProgressStepperItem extends PFElement {
   static get properties() {
     return {
       state: { type: String, default: "inactive" },
-      vertical: { type: String, default: false }
+      vertical: { type: String, default: false },
+      current: { type: Boolean, default: false, observer: "_currentHandler" },
     };
   }
 
@@ -55,8 +56,6 @@ class PfeProgressStepperItem extends PFElement {
   constructor() {
     super(PfeProgressStepperItem, { type: PfeProgressStepperItem.PfeType });
     this._hasLink = false;
-    this._linkOpenTag = " ";
-    this._linkClosingTag = " ";
   }
 
   connectedCallback() {
@@ -73,16 +72,24 @@ class PfeProgressStepperItem extends PFElement {
 
   _build() {
     // Find out if there are any links
-    const fragment = document.createElement("div");
     const link = this.querySelector(`a[slot="link"]`);
     if (link) {
       // let the component know we have a link
       this._hasLink = true;
       this.setAttribute("hasLink", true);
+      // store link in a local variable for later use.
       this._link = link;
+      // Set accessibility attrs
       this.setAttribute("tabindex", "0");
-    }
-    else {
+      this.setAttribute("role", "link");
+      const linkText = link.innerText;
+      if (linkText) {
+        this.setAttribute("aria-label", linkText);
+      }
+    } else {
+      this.removeAttribute("tabindex");
+      this.removeAttribute("role");
+      this.removeAttribute("aria-label");
       this._hasLink = false;
     }
   }
@@ -107,6 +114,16 @@ class PfeProgressStepperItem extends PFElement {
         event.preventDefault();
         this._clickHandler(event);
         break;
+    }
+  }
+
+  // Toggle aria attributes when current state changes
+  _currentHandler() {
+    if (this.current) {
+      this.setAttribute("aria-current", "true");
+    }
+    else {
+      this.removeAttribute("aria-current");
     }
   }
 }
