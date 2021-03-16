@@ -1,17 +1,19 @@
-<div class="pf-c-alert pf-m-success" aria-label="Success alert">
-    <div class="pf-c-alert__icon">
-        ${this.renderIcon();}
+<div class="pfe-alert">
+    <div class="pfe-alert__header">
+        <div class="pfe-alert__icon">
+            ${this.renderIcon()}
+        </div>
+        <div class="pfe-alert__title">
+            <slot name="title"></slot>
+        </div>
     </div>
-    <p class="pf-c-alert__title">
-        <slot name="title"></slot>
-    </p>
-    <div class="pf-c-alert__action">
+    <div class="pfe-alert__action">
         <pfe-icon icon="web-icon-close" size="1x"></pfe-icon>
     </div>
-    <div class="pf-c-alert__description">
+    <div class="pfe-alert__description">
         <slot name="description"></slot>
     </div>
-    <div class="pf-c-alert__action-group">
+    <div class="pfe-alert__action-group">
         <slot name="action-group"></slot>
     </div>
 </div>

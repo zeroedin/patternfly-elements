@@ -8,7 +8,24 @@ $LOCAL: alert;
 // --pfe-alert__region--Property: value;
 
 // This variable is global so that helper functions can reference it
-$LOCAL-VARIABLES: ();
+$LOCAL-VARIABLES: (
+  // cyan-50
+  BackgroundColor: #F2F9F9,
+  // cyan-300
+  BorderColor: #009596,
+  title: (
+    Color: #003737,
+    FontSize: 14px,
+    FontFamily: "Red Hat Text, Medium",
+    FontWeight: 500,
+  ),
+  icon: (
+    // cyan-300
+    Color: #009596,
+    Width: 24px,
+    Height: 24px,
+  ),
+);
 
 :host {
   // Avoid printing local variables on host, instead use the pfe-local() function to set property values
@@ -20,181 +37,70 @@ $LOCAL-VARIABLES: ();
   display: none;
 }
 
-.pf-c-alert {
-  // Component variables
-  --pf-c-alert--BoxShadow: var(--pf-global--BoxShadow--lg);
-  --pf-c-alert--BackgroundColor: var(--pf-global--BackgroundColor--100);
-  --pf-c-alert--GridTemplateColumns: max-content 1fr max-content;
-  --pf-c-alert--BorderTopWidth: var(--pf-global--BorderWidth--md);
-  --pf-c-alert--BorderTopColor: var(--pf-global--default-color--200);
-  --pf-c-alert--PaddingTop: var(--pf-global--spacer--md);
-  --pf-c-alert--PaddingRight: var(--pf-global--spacer--md);
-  --pf-c-alert--PaddingBottom: var(--pf-global--spacer--md);
-  --pf-c-alert--PaddingLeft: var(--pf-global--spacer--md);
-  --pf-c-alert__FontSize: var(--pf-global--FontSize--sm);
+.pfe-alert {
+  border-top: 3px solid transparent;
+  border-color: pfe-local(BorderColor);
+  background-color: pfe-local(BackgroundColor);
 
-  // Icon
-  --pf-c-alert__icon--Color: var(--pf-global--default-color--200);
-  --pf-c-alert__icon--MarginTop: #{pf-size-prem(1px)};
-  --pf-c-alert__icon--MarginRight: var(--pf-global--spacer--sm);
-  --pf-c-alert__icon--FontSize: var(--pf-global--icon--FontSize--md);
-
-  // Title
-  --pf-c-alert__title--FontWeight: var(--pf-global--FontWeight--bold);
-  --pf-c-alert__title--Color: var(--pf-global--default-color--300);
-  --pf-c-alert__title--max-lines: 1;
-
-  // Action
-  --pf-c-alert__action--MarginTop: calc(var(--pf-global--spacer--form-element) * -1);
-  --pf-c-alert__action--MarginBottom: calc(var(--pf-global--spacer--form-element) * -1);
-  --pf-c-alert__action--TranslateY: #{pf-size-prem(2px)};
-  --pf-c-alert__action--MarginRight: calc(var(--pf-global--spacer--sm) * -1);
-
-  // Action Description
-  --pf-c-alert__description--PaddingTop: var(--pf-global--spacer--xs);
-
-  // Alert action group
-  --pf-c-alert__action-group--PaddingTop: var(--pf-global--spacer--xs);
-  --pf-c-alert__description--action-group--PaddingTop: var(--pf-global--spacer--md);
-  --pf-c-alert__action-group__c-button--not-last-child--MarginRight: var(--pf-global--spacer--lg);
-
-  // Success
-  --pf-c-alert--m-success--BorderTopColor: var(--pf-global--success-color--100);
-  --pf-c-alert--m-success__icon--Color: var(--pf-global--success-color--100);
-  --pf-c-alert--m-success__title--Color: var(--pf-global--success-color--200);
-
-  // Danger
-  --pf-c-alert--m-danger--BorderTopColor: var(--pf-global--danger-color--100);
-  --pf-c-alert--m-danger__icon--Color: var(--pf-global--danger-color--100);
-  --pf-c-alert--m-danger__title--Color: var(--pf-global--danger-color--200);
-
-  // Warning
-  --pf-c-alert--m-warning--BorderTopColor: var(--pf-global--warning-color--100);
-  --pf-c-alert--m-warning__icon--Color: var(--pf-global--warning-color--100);
-  --pf-c-alert--m-warning__title--Color: var(--pf-global--warning-color--200);
-
-  // Info
-  --pf-c-alert--m-info--BorderTopColor: var(--pf-global--info-color--100);
-  --pf-c-alert--m-info__icon--Color: var(--pf-global--info-color--100);
-  --pf-c-alert--m-info__title--Color: var(--pf-global--info-color--200);
-
-  // Inline modification
-  --pf-c-alert--m-inline--BoxShadow: none;
-  --pf-c-alert--m-inline--BackgroundColor: var(--pf-global--palette--cyan-50);
-
-  // Inline success
-  --pf-c-alert--m-inline--m-success--BackgroundColor: var(--pf-global--palette--green-50);
-
-  // Inline danger
-  --pf-c-alert--m-inline--m-danger--BackgroundColor: var(--pf-global--palette--red-50);
-
-  // Inline warning
-  --pf-c-alert--m-inline--m-warning--BackgroundColor: var(--pf-global--palette--gold-50);
-
-  // Inline info
-  --pf-c-alert--m-inline--m-info--BackgroundColor: var(--pf-global--palette--blue-50);
-
-  // @include pf-t-light; // This component always needs to be light
-
-  position: relative;
-  display: grid;
-  padding: 16px;
-  font-size: 14px;
-  background-color: rgb(243, 250, 242);
-  border-top: 2px solid rgb(62, 134, 53);
-  box-shadow: none;
-  grid-template-columns: 30.5px 702.5px 35px;
-  color: #151515;
-  grid-template-areas:
-    "icon title action"
-    ". description description"
-    ". actiongroup actiongroup";
-
-  &.pf-m-success {
-    --pf-c-alert--BorderTopColor: var(--pf-c-alert--m-success--BorderTopColor);
-    --pf-c-alert__icon--Color: var(--pf-c-alert--m-success__icon--Color);
-    --pf-c-alert__title--Color: rgb(30, 79, 24);
-    --pf-c-alert--m-inline--BackgroundColor: var(--pf-c-alert--m-inline--m-success--BackgroundColor);
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  &.pf-m-danger {
-    --pf-c-alert--BorderTopColor: var(--pf-c-alert--m-danger--BorderTopColor);
-    --pf-c-alert__icon--Color: var(--pf-c-alert--m-danger__icon--Color);
-    --pf-c-alert__title--Color: var(--pf-c-alert--m-danger__title--Color);
-    --pf-c-alert--m-inline--BackgroundColor: var(--pf-c-alert--m-inline--m-danger--BackgroundColor);
+  &__title {
+    font-size: pfe-local(FontSize, $region: title);
+    color: pfe-local(Color, $region: title);
+    font-size: pfe-local(FontSize, $region: title);
+    font-weight: pfe-local(FontWeight, $region: title);
   }
 
-  &.pf-m-warning {
-    --pf-c-alert--BorderTopColor: var(--pf-c-alert--m-warning--BorderTopColor);
-    --pf-c-alert__icon--Color: var(--pf-c-alert--m-warning__icon--Color);
-    --pf-c-alert__title--Color: var(--pf-c-alert--m-warning__title--Color);
-    --pf-c-alert--m-inline--BackgroundColor: var(--pf-c-alert--m-inline--m-warning--BackgroundColor);
-  }
-
-  &.pf-m-info {
-    --pf-c-alert--BorderTopColor: var(--pf-c-alert--m-info--BorderTopColor);
-    --pf-c-alert__icon--Color: var(--pf-c-alert--m-info__icon--Color);
-    --pf-c-alert__title--Color: var(--pf-c-alert--m-info__title--Color);
-    --pf-c-alert--m-inline--BackgroundColor: var(--pf-c-alert--m-inline--m-info--BackgroundColor);
-  }
-
-  &.pf-m-inline {
-    --pf-c-alert--BoxShadow: var(--pf-c-alert--m-inline--BoxShadow);
-    --pf-c-alert--BackgroundColor: var(--pf-c-alert--m-inline--BackgroundColor);
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: pfe-local(Width, $region: icon);
+    height: pfe-local(Height, $region: icon);
+    color: pfe-local(Color, $region: icon);
   }
 }
 
-.pf-c-alert__icon {
-  grid-area: icon;
-  display: flex;
-  margin-top: 1px;
-  margin-right: 0px;
-  font-size: 14px;
-  color: rgb(21, 21, 21);
+:host([state="info"]) .pfe-alert {
+  // blue-300
+  --pfe-alert--BorderColor: #2B9AF3;
+  --pfe-alert__icon--Color: #2B9AF3;
+  // blue-600
+  --pfe-alert__title--Color: #002952;
+  // blue-50
+  --pfe-alert--BackgroundColor: #E7F1FA;
 }
 
-.pf-c-alert__title {
-  grid-area: title;
-  font-weight: var(--pf-c-alert__title--FontWeight);
-  color: var(--pf-c-alert__title--Color);
-  word-break: break-word;
-
-  &.pf-m-truncate {
-    // @include pf-line-clamp("var(--pf-c-alert__title--max-lines)");
-  }
+:host([state="success"]) .pfe-alert {
+  // green-500
+  --pfe-alert--BorderColor: #3E8635;
+  --pfe-alert__icon--Color: #3E8635;
+  // green-600
+  --pfe-alert__title--Color: #1E4F18;
+  // green-50
+  --pfe-alert--BackgroundColor: #F3FAF2;
 }
 
-.pf-c-alert__description {
-  grid-area: description;
-  padding-top: var(--pf-c-alert__description--PaddingTop);
-  word-break: break-word;
-
-  + .pf-c-alert__action-group {
-    --pf-c-alert__action-group--PaddingTop: var(--pf-c-alert__description--action-group--PaddingTop);
-  }
+:host([state="warning"]) .pfe-alert {
+  // gold-600
+  --pfe-alert__title--Color: #795600;
+  // gold-400
+  --pfe-alert--BorderColor: #F0AB00;
+  --pfe-alert__icon--Color: #F0AB00;
+  // gold-50
+  --pfe-alert--BackgroundColor: #FDF7E7;
 }
 
-.pf-c-alert__action {
-  grid-area: action;
-  margin-top: var(--pf-c-alert__action--MarginTop);
-  margin-right: var(--pf-c-alert__action--MarginRight);
-  margin-bottom: var(--pf-c-alert__action--MarginBottom);
-  transform: translateY(var(--pf-c-alert__action--TranslateY));
-
-  > .pf-c-button {
-    --pf-c-button--LineHeight: 1;
-  }
-}
-
-.pf-c-alert__action-group {
-  grid-area: actiongroup;
-  padding-top: var(--pf-c-alert__action-group--PaddingTop);
-
-  > .pf-c-button {
-    --pf-c-button--m-link--m-inline--hover--TextDecoration: none;
-
-    &:not(:last-child) {
-      margin-right: var(--pf-c-alert__action-group__c-button--not-last-child--MarginRight);
-    }
-  }
+:host([state="danger"]) .pfe-alert {
+  // red-100
+  --pfe-alert--BorderColor: #C9190B;
+  --pfe-alert__icon--Color: #C9190B;
+  // red-300
+  --pfe-alert__title--Color: #7D1007;
+  // gold-50
+  --pfe-alert--BackgroundColor: #FAEAE8;
 }
