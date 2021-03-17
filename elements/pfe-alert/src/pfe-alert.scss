@@ -13,17 +13,26 @@ $LOCAL-VARIABLES: (
   BackgroundColor: #F2F9F9,
   // cyan-300
   BorderColor: #009596,
+  // --pf-global--spacer--md
+  Padding: 16px,
+  header: (
+    // --pf-global--spacer--xs
+    MarginBottom: var(--pfe-alert--Gap, 4px),
+    MarginLeft: var(--pfe-alert--Gap, 4px),
+  ),
   title: (
     Color: #003737,
     FontSize: 14px,
-    FontFamily: "Red Hat Text, Medium",
     FontWeight: 500,
   ),
   icon: (
     // cyan-300
     Color: #009596,
-    Width: 24px,
-    Height: 24px,
+    Width: var(--pfe-alert__icon--Size, 24px),
+    Height: var(--pfe-alert__icon--Size, 24px),
+  ),
+  description: (
+    MarginLeft: calc(var(--pfe-alert--Gap, 4px) + var(--pfe-alert__icon--Size, 24px)),
   ),
 );
 
@@ -41,11 +50,15 @@ $LOCAL-VARIABLES: (
   border-top: 3px solid transparent;
   border-color: pfe-local(BorderColor);
   background-color: pfe-local(BackgroundColor);
+  // --pf-global--spacer--md
+  padding: pfe-local(Padding);
 
   &__header {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    margin-bottom: pfe-local(MarginBottom, $region: header);
+    margin-left: pfe-local(MarginLeft, $region: header);
   }
 
   &__title {
@@ -53,6 +66,7 @@ $LOCAL-VARIABLES: (
     color: pfe-local(Color, $region: title);
     font-size: pfe-local(FontSize, $region: title);
     font-weight: pfe-local(FontWeight, $region: title);
+    flex: 1 1 auto;
   }
 
   &__icon {
@@ -62,6 +76,13 @@ $LOCAL-VARIABLES: (
     width: pfe-local(Width, $region: icon);
     height: pfe-local(Height, $region: icon);
     color: pfe-local(Color, $region: icon);
+  }
+
+  &__action {
+  }
+
+  &__description {
+    margin-left: pfe-local(MarginLeft, $region: description);
   }
 }
 
