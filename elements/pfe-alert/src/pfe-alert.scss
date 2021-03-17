@@ -32,7 +32,32 @@ $LOCAL-VARIABLES: (
     Height: var(--pfe-alert__icon--Size, 24px),
   ),
   description: (
+    // probably switch this out for css grid
     MarginLeft: calc(var(--pfe-alert--Gap, 4px) + var(--pfe-alert__icon--Size, 24px)),
+  ),
+  close-button: (
+    // Black-600
+    Color: #6A6E73,
+    BackgroundColor: transparent,
+    Border: none,
+    Height: var(--pfe-alert__close-button--Size, 24px),
+    Width: var(--pfe-alert__close-button--Size, 24px),
+  ),
+  action-group: (
+    MarginTop: var(--pfe-alert--Padding, 16px),
+    MarginLeft: calc(var(--pfe-alert--Gap, 4px) + var(--pfe-alert__icon--Size, 24px)),
+    // We need to offset the margin-right of the items below it.
+    MarginRight: calc(var(--pfe-alert__action-group--Gap, 24px) * -1),
+    // --pf-global--spacer--lg
+    Gap: 24px,
+  ),
+  action-group-item: (
+    MarginRight: var(--pfe-alert__action-group--Gap, 24px),
+    Padding: 0,
+    border: none,
+    BackgroundColor: transparent,
+    Color: #0066CC,
+    FontSize: 14px,
   ),
 );
 
@@ -78,11 +103,39 @@ $LOCAL-VARIABLES: (
     color: pfe-local(Color, $region: icon);
   }
 
-  &__action {
+  &__close-button {
+    color: pfe-local(Color, $region: close-button);
+    background-color: pfe-local(BackgroundColor, $region: close-button);
+    border: pfe-local(Border, $region: close-button);
+    width: pfe-local(Width, $region: close-button);
+    height: pfe-local(Height, $region: close-button);
   }
 
   &__description {
     margin-left: pfe-local(MarginLeft, $region: description);
+  }
+
+  &__action-group {
+    margin-top: pfe-local(MarginTop, $region: action-group);
+    margin-left: pfe-local(MarginLeft, $region: action-group);
+    margin-right: pfe-local(MarginRight, $region: action-group);
+  }
+
+  &__action-group-item,
+  #action-group::slotted(.pfe-alert__action-group-item) {
+    margin-right: pfe-local(MarginRight, $region: action-group-item);
+    padding: pfe-local(Padding, $region: action-group-item);
+    border: pfe-local(Border, $region: action-group-item);
+    background-color: pfe-local(BackgroundColor, $region: action-group-item);
+    color: pfe-local(Color, $region: action-group-item);
+    font-size: pfe-local(FontSize, $region: action-group-item);
+  }
+  // Turn a button into a regular looking link
+  // I'm using important because pfe-base takes
+  // precedence.
+  button#{&__action-group-item},
+  #action-group::slotted(button#{&__action-group-item}) {
+    margin-right: pfe-local(MarginRight, $region: action-group-item) !important;
   }
 }
 
