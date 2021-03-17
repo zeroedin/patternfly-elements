@@ -66,6 +66,7 @@ class PfeAlert extends PFElement {
 
   constructor() {
     super(PfeAlert, { type: PfeAlert.PfeType });
+    this.addEventListener("click", this._clickHandler.bind(this));
   }
 
   connectedCallback() {
@@ -75,6 +76,16 @@ class PfeAlert extends PFElement {
   }
 
   disconnectedCallback() {}
+
+  _clickHandler(event) {
+    // look for confirm or dismiss
+    if (event.target.hasAttribute("confirm")) {
+      console.log("confirm");
+    }
+    if (event.target.hasAttribute("dismiss")) {
+      console.log("dismiss");
+    }
+  }
 }
 
 PFElement.create(PfeAlert);
