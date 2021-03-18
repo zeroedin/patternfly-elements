@@ -61,6 +61,11 @@ $LOCAL-VARIABLES: (
     Color: #0066CC,
     FontSize: 14px,
   ),
+  action-group-item--hover: (
+    // blue-500
+    Color: #0066CC,
+    TextDecoration: underline,
+  ),
 );
 
 :host {
@@ -112,6 +117,7 @@ $LOCAL-VARIABLES: (
     border: pfe-local(Border, $region: close-button);
     width: pfe-local(Width, $region: close-button);
     height: pfe-local(Height, $region: close-button);
+    cursor: pointer;
   }
 
   &__description {
@@ -132,6 +138,12 @@ $LOCAL-VARIABLES: (
     background-color: pfe-local(BackgroundColor, $region: action-group-item);
     color: pfe-local(Color, $region: action-group-item);
     font-size: pfe-local(FontSize, $region: action-group-item);
+  }
+  &__action-group-item:hover,
+  #action-group::slotted(.pfe-alert__action-group-item:hover) {
+    text-decoration: pfe-local(TextDecoration, $region: action-group-item--hover);
+    // blue-500
+    color: pfe-local(Color, $region: action-group-item--hover);
   }
   // Turn a button into a regular looking link
   // I'm using important because pfe-base takes
