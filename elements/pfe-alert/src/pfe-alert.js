@@ -36,7 +36,7 @@ class PfeAlert extends PFElement {
 
   static get properties() {
     return {
-      state: { type: String, default: "default" },
+      state: { type: String, default: "default" }
     };
   }
 
