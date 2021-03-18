@@ -22,14 +22,22 @@ class PfeAlert extends PFElement {
     return "pfe-alert.scss";
   }
 
-  // static get events() {
-  //   return {
-  //   };
-  // }
+  static get events() {
+    return {
+      confirm: `${this.tag}:confirm`,
+      dismiss: `${this.tag}:dismiss`
+    };
+  }
 
   // Declare the type of this component
   static get PfeType() {
     return PFElement.PfeTypes.Content;
+  }
+
+  static get properties() {
+    return {
+      state: { type: String, default: "default" },
+    };
   }
 
   renderIcon() {
@@ -54,18 +62,13 @@ class PfeAlert extends PFElement {
     return ``;
   }
 
-  static get properties() {
-    return {
-      state: { type: String, default: "default" }
-    };
-  }
-
   static get slots() {
     return {};
   }
 
   constructor() {
     super(PfeAlert, { type: PfeAlert.PfeType });
+    // Listen to click events to see if anyone clicked on a confirm / dismiss
     this.addEventListener("click", this._clickHandler.bind(this));
   }
 
@@ -75,15 +78,49 @@ class PfeAlert extends PFElement {
     this.render();
   }
 
-  disconnectedCallback() {}
+  render() {
+    super.render();
+    this._addEventListeners();
+  }
+
+  _addEventListeners() {
+    this.shadowRoot.querySelector("#close-button").addEventListener("click", this._clickHandler.bind(this));
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener("click", this._clickHandler.bind(this));
+    this.shadowRoot.querySelector("#close-button").removeEventListener("click", this._clickHandler.bind(this));
+  }
+
+  /**
+   * Dismiss the alert
+   *
+   * This will remove the alert from the dom.
+   */
+  dismiss() {
+    this.remove();
+  }
 
   _clickHandler(event) {
     // look for confirm or dismiss
-    if (event.target.hasAttribute("confirm")) {
-      console.log("confirm");
-    }
-    if (event.target.hasAttribute("dismiss")) {
-      console.log("dismiss");
+    const target = event.target.closest("button, .pfe-alert__action-group-item");
+    if (target) {
+      if (target.hasAttribute("confirm")) {
+        this.emitEvent(PfeAlert.events.confirm, {
+          detail: {
+            target
+          }
+        });
+        this.dismiss();
+      }
+      if (target.hasAttribute("dismiss")) {
+        this.emitEvent(PfeAlert.events.confirm, {
+          detail: {
+            target
+          }
+        });
+        this.dismiss();
+      }
     }
   }
 }
