@@ -43,9 +43,9 @@ class PfeProgressStepperItem extends PFElement {
 
   static get properties() {
     return {
-      state: { type: String, default: "inactive" },
+      state: { type: String, default: "inactive", observer: "_stateHandler" },
       vertical: { type: String, default: false },
-      current: { type: Boolean, default: false, observer: "_currentHandler" },
+      current: { type: Boolean, default: false, observer: "_currentHandler" }
     };
   }
 
@@ -68,6 +68,11 @@ class PfeProgressStepperItem extends PFElement {
   disconnectedCallback() {
     this.removeEventListener("click", this._clickHandler.bind(this));
     this.removeEventListener("keydown", this._keydownHandler.bind(this));
+  }
+
+  // Rerender the template if this property changes
+  _stateHandler(test) {
+    if (this._rendered) this.render();
   }
 
   _build() {
@@ -121,8 +126,7 @@ class PfeProgressStepperItem extends PFElement {
   _currentHandler() {
     if (this.current) {
       this.setAttribute("aria-current", "true");
-    }
-    else {
+    } else {
       this.removeAttribute("aria-current");
     }
   }
