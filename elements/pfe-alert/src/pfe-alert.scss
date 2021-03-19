@@ -79,12 +79,19 @@ $LOCAL-VARIABLES: (
 }
 
 .pfe-alert {
-  border-width: pfe-local(BorderWidth);
-  border-color: pfe-local(BorderColor);
-  border-style: pfe-local(BorderStyle);
-  background-color: pfe-local(BackgroundColor);
-  // --pf-global--spacer--md
-  padding: pfe-local(Padding);
+  // container? Yeah it's a good question. I originally want to try have the entired
+  // BEM markup in the render function (meaning the top level div having a class of .pfe-alert)
+  // but that doesn't work with Shadydom. So I just swapped it out for this container div for now.
+  // I like the encapsulation and having declaritively having all of the aria states in the render
+  // function. But I'm still on the fence. :shrug:
+  &__container {
+    border-width: pfe-local(BorderWidth);
+    border-color: pfe-local(BorderColor);
+    border-style: pfe-local(BorderStyle);
+    background-color: pfe-local(BackgroundColor);
+    // --pf-global--spacer--md
+    padding: pfe-local(Padding);
+  }
 
   &__header {
     display: flex;
@@ -129,33 +136,33 @@ $LOCAL-VARIABLES: (
     margin-left: pfe-local(MarginLeft, $region: action-group);
     margin-right: pfe-local(MarginRight, $region: action-group);
   }
+}
 
-  &__action-group-item,
-  #action-group::slotted(.pfe-alert__action-group-item) {
-    margin-right: pfe-local(MarginRight, $region: action-group-item);
-    padding: pfe-local(Padding, $region: action-group-item);
-    border: pfe-local(Border, $region: action-group-item);
-    background-color: pfe-local(BackgroundColor, $region: action-group-item);
-    color: pfe-local(Color, $region: action-group-item);
-    font-size: pfe-local(FontSize, $region: action-group-item);
-  }
-  &__action-group-item:hover,
-  #action-group::slotted(.pfe-alert__action-group-item:hover) {
-    text-decoration: pfe-local(TextDecoration, $region: action-group-item--hover);
-    // blue-500
-    color: pfe-local(Color, $region: action-group-item--hover);
-  }
-  // Turn a button into a regular looking link
-  // I'm using important because pfe-base takes
-  // precedence.
-  button#{&__action-group-item},
-  #action-group::slotted(button#{&__action-group-item}) {
-    margin-right: pfe-local(MarginRight, $region: action-group-item) !important;
-  }
+.pfe-alert__action-group-item,
+#action-group::slotted(.pfe-alert__action-group-item) {
+  margin-right: pfe-local(MarginRight, $region: action-group-item);
+  padding: pfe-local(Padding, $region: action-group-item);
+  border: pfe-local(Border, $region: action-group-item);
+  background-color: pfe-local(BackgroundColor, $region: action-group-item);
+  color: pfe-local(Color, $region: action-group-item);
+  font-size: pfe-local(FontSize, $region: action-group-item);
+}
+.pfe-alert__action-group-item:hover,
+#action-group::slotted(.pfe-alert__action-group-item:hover) {
+  text-decoration: pfe-local(TextDecoration, $region: action-group-item--hover);
+  // blue-500
+  color: pfe-local(Color, $region: action-group-item--hover);
+}
+// Turn a button into a regular looking link
+// I'm using important because pfe-base takes
+// precedence.
+button.pfe-alert__action-group-item,
+#action-group::slotted(.pfe-alert__action-group-item) {
+  margin-right: pfe-local(MarginRight, $region: action-group-item) !important;
 }
 
 // @todo these need to be empty variables.
-:host([state="info"]) .pfe-alert {
+:host([state="info"]) .pfe-alert__container {
   // blue-300
   --pfe-alert--BorderColor: #2B9AF3;
   --pfe-alert__icon--Color: #2B9AF3;
@@ -165,7 +172,8 @@ $LOCAL-VARIABLES: (
   --pfe-alert--BackgroundColor: #E7F1FA;
 }
 
-:host([state="success"]) .pfe-alert {
+// @todo these need to be empty variables.
+:host([state="success"]) .pfe-alert__container {
   // green-500
   --pfe-alert--BorderColor: #3E8635;
   --pfe-alert__icon--Color: #3E8635;
@@ -175,7 +183,8 @@ $LOCAL-VARIABLES: (
   --pfe-alert--BackgroundColor: #F3FAF2;
 }
 
-:host([state="warning"]) .pfe-alert {
+// @todo these need to be empty variables.
+:host([state="warning"]) .pfe-alert__container {
   // gold-600
   --pfe-alert__title--Color: #795600;
   // gold-400
@@ -185,7 +194,8 @@ $LOCAL-VARIABLES: (
   --pfe-alert--BackgroundColor: #FDF7E7;
 }
 
-:host([state="danger"]) .pfe-alert {
+// @todo these need to be empty variables.
+:host([state="danger"]) .pfe-alert__container {
   // red-100
   --pfe-alert--BorderColor: #C9190B;
   --pfe-alert__icon--Color: #C9190B;
@@ -195,7 +205,7 @@ $LOCAL-VARIABLES: (
   --pfe-alert--BackgroundColor: #FAEAE8;
 }
 
-:host(:not([variant])) .pfe-alert {
+:host(:not([variant])) .pfe-alert__container {
   border-left: none;
   border-bottom: none;
   border-right: none;
