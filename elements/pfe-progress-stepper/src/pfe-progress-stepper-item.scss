@@ -35,17 +35,19 @@ $LOCAL-VARIABLES: (
 }
 
 .pfe-progress-stepper-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #151515;
-  font-size: 16px;
-  // This is important so the .pfe-progress-stepper
-  // can dynamically set the width of the items in horizontal
-  // layout. If this isn't set then the items are unable
-  // to line up correctly.
-  width: pfe-local(Width);
+  &__container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #151515;
+    font-size: 16px;
+    // This is important so the .pfe-progress-stepper
+    // can dynamically set the width of the items in horizontal
+    // layout. If this isn't set then the items are unable
+    // to line up correctly.
+    width: pfe-local(Width);
+  }
 
   &__circle-wrapper {
     display: flex;
@@ -130,11 +132,9 @@ $LOCAL-VARIABLES: (
 }
 
 :host([hasLink]:is(:focus,:hover)) {
-  .pfe-progress-stepper-item {
-    --pfe-progress-stepper-item__title--Color: var(--pfe-progress-stepper-item__focus__text--Color, #0066CC);
-    --pfe-progress-stepper-item__description--Color: var(--pfe-progress-stepper-item__focus__text--Color, #0066CC);
-    text-decoration: var(--pfe-progress-stepper-item__focus--TextDecoration, none);
-  }
+  --pfe-progress-stepper-item__title--Color: var(--pfe-progress-stepper-item__focus__text--Color, #0066CC);
+  --pfe-progress-stepper-item__description--Color: var(--pfe-progress-stepper-item__focus__text--Color, #0066CC);
+  text-decoration: var(--pfe-progress-stepper-item__focus--TextDecoration, none);
 }
 
 :host([state="active"]) {
@@ -172,9 +172,9 @@ $LOCAL-VARIABLES: (
 }
 
 :host([state="error"]) {
+  --pfe-progress-stepper-item__title--Color: #C9190B;
+  --pfe-progress-stepper-item__description--Color: #C9190B;
   .pfe-progress-stepper-item {
-    --pfe-progress-stepper-item__title--Color: #C9190B;
-    --pfe-progress-stepper-item__description--Color: #C9190B;
     &__circle--inner {
       display: none;
     }
@@ -188,8 +188,10 @@ $LOCAL-VARIABLES: (
 
 :host([vertical]) {
   .pfe-progress-stepper-item {
-    flex-direction: row;
-    align-items: flex-start;
+    &__container {
+      flex-direction: row;
+      align-items: flex-start;
+    }
     &__circle-wrapper {
       // we need to get rid of the margin auto to make the circle raise to
       // the top of the vertical container

@@ -32,11 +32,18 @@ $LOCAL-VARIABLES: (
 }
 
 .pfe-progress-stepper {
-  display: flex;
-  width: auto;
-  justify-content: space-between;
-  position: relative;
-  align-items: flex-start;
+  // container? Yeah it's a good question. I originally want to try have the entired
+  // BEM markup in the render function (meaning the top level div having a class of .pfe-alert)
+  // but that doesn't work with Shadydom. So I just swapped it out for this container div for now.
+  // I like the encapsulation and having declaritively having all of the aria states in the render
+  // function. But I'm still on the fence. :shrug:
+  &__container {
+    display: flex;
+    width: auto;
+    justify-content: space-between;
+    position: relative;
+    align-items: flex-start;
+  }
 
   &__progress-bar {
     top: 15px;
@@ -66,8 +73,10 @@ $LOCAL-VARIABLES: (
 
 :host([vertical]) {
   & .pfe-progress-stepper {
-    // Make everything vertical
-    flex-direction: column;
+    &__container {
+      // Make everything vertical
+      flex-direction: column;
+    }
 
     &__progress-bar {
       // Position the progress bar correctly over the circle
@@ -81,5 +90,13 @@ $LOCAL-VARIABLES: (
       width: var(--pfe-progress-stepper__progress-bar--Width, 2px);
       height: 0;
     }
+  }
+}
+
+// @todo This definitely would need some IE love since it's flexbox and
+// driven by CSS variables so I'm just not displaying it in IE for now.
+.pfe-progress-stepper {
+  @include browser-query(ie11) {
+    display: none;
   }
 }
