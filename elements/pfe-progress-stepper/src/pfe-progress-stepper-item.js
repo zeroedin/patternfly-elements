@@ -43,7 +43,7 @@ class PfeProgressStepperItem extends PFElement {
 
   static get properties() {
     return {
-      state: { type: String, default: "inactive", observer: "_stateHandler" },
+      state: { type: String, default: "inactive", observer: "render" },
       vertical: { type: String, default: false },
       current: { type: Boolean, default: false, observer: "_currentHandler" }
     };
