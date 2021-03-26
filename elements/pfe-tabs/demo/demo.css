@@ -6,6 +6,10 @@ pfe-tabs {
     margin-bottom: calc(var(--pfe-theme--container--spacer, 16px) * 5);
 }
 
+pfe-band[color="lightest"] {
+    --pfe-band--BackgroundColor: rgb(245, 239, 226);
+}
+
 @media screen and (max-width: 899px) {
     a[href="#top"] {
         display: none;

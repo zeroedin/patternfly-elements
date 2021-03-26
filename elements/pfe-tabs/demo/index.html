@@ -644,16 +644,12 @@
     var contextBand = document.querySelector("#context-band");
     var contextSelect = document.querySelector("pfe-select");
     contextSelect.addEventListener("pfe-select:change", function (event) {
-      switch (event.detail.value) {
-        case "dark":
-          contextBand.setAttribute("color", "darkest");
-          break;
-        case "saturated":
-          contextBand.setAttribute("color", "accent");
-          break;
-        default:
-          contextBand.setAttribute("color", "lightest");
-          break;
+      if (event.detail.value === "dark") {
+        contextBand.setAttribute("color", "darkest");
+      } else if (event.detail.value === "saturated") {
+        contextBand.setAttribute("color", "accent");
+      } else {
+        contextBand.setAttribute("color", "lightest");
       }
     });
 

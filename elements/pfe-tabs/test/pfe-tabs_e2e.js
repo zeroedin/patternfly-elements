@@ -16,7 +16,7 @@ describe(element, () => {
 
   ["light", "dark", "saturated"].forEach(context => {
     it(`should take a screenshot and compare for ${context} context`, () => {
-      $("#context").selectByAttribute("value", context);
+      $("select").selectByAttribute("value", context);
       browser.saveFullPageScreen(`${element}--${context}`, snapshotOptions);
       expect(browser.checkFullPageScreen(`${element}--${context}`, snapshotOptions)).toBeLessThan(3.1);
     });
