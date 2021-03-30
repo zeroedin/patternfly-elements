@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+// :host([word count=""]) {
+  // Custom styles applied by this attribute
+// }
+
+
+
