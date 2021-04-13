@@ -2,10 +2,10 @@
 @import "../../pfe-sass/pfe-sass";
 
 
-$LOCAL: progress-stepper;
+$LOCAL: progress-steps;
 
 // Example local variable, using BEM format
-// --pfe-progress-stepper__region--Property: value;
+// --pfe-progress-steps__region--Property: value;
 
 // This variable is global so that helper functions can reference it
 $LOCAL-VARIABLES: (
@@ -24,14 +24,14 @@ $LOCAL-VARIABLES: (
   display: block;
   // We have to set the size of the circle size here so our vertical progress bar knows how much
   // offset to do.
-  --pfe-progress-stepper-item__circle--Size: var(--pfe-progress-stepper__circle--Size, 32px);
+  --pfe-progress-steps-item__circle--Size: var(--pfe-progress-steps__circle--Size, 32px);
 }
 
 :host([hidden]) {
   display: none;
 }
 
-.pfe-progress-stepper {
+.pfe-progress-steps {
   // container? Yeah it's a good question. I originally want to try have the entired
   // BEM markup in the render function (meaning the top level div having a class of .pfe-alert)
   // but that doesn't work with Shadydom. So I just swapped it out for this container div for now.
@@ -50,7 +50,7 @@ $LOCAL-VARIABLES: (
     display: flex;
     position: absolute;
     height: 2px;
-    width: calc(100% - var(--pfe-progress-stepper__item--Width, 75px));
+    width: calc(100% - var(--pfe-progress-steps__item--Width, 75px));
     background-color: pfe-local(Color, $region: progress-bar);
     left: 50%;
     transform: translateX(-50%);
@@ -68,11 +68,11 @@ $LOCAL-VARIABLES: (
   // works correctly.
   // @todo: is there a helper function to print the local variable here?
   // I.e. I should be printing 75px.
-  --pfe-progress-stepper-item--Width: var(--pfe-progress-stepper__item--Width, 75px);
+  --pfe-progress-steps-item--Width: var(--pfe-progress-steps__item--Width, 75px);
 }
 
 :host([vertical]) {
-  & .pfe-progress-stepper {
+  & .pfe-progress-steps {
     &__container {
       // Make everything vertical
       flex-direction: column;
@@ -80,14 +80,14 @@ $LOCAL-VARIABLES: (
 
     &__progress-bar {
       // Position the progress bar correctly over the circle
-      top: calc(var(--pfe-progress-stepper-item__circle--Size) / 2);
-      left: calc(var(--pfe-progress-stepper-item__circle--Size) / 2);
-      width: var(--pfe-progress-stepper__progress-bar--Width, 2px);
+      top: calc(var(--pfe-progress-steps-item__circle--Size) / 2);
+      left: calc(var(--pfe-progress-steps-item__circle--Size) / 2);
+      width: var(--pfe-progress-steps__progress-bar--Width, 2px);
       // @todo: this is a hack. trying to guess
-      height: calc(100% - var(--pfe-progress-stepper-item__circle--Size) * 1.3);
+      height: calc(100% - var(--pfe-progress-steps-item__circle--Size) * 1.3);
     }
     &__progress-bar-fill {
-      width: var(--pfe-progress-stepper__progress-bar--Width, 2px);
+      width: var(--pfe-progress-steps__progress-bar--Width, 2px);
       height: 0;
     }
   }
@@ -95,7 +95,7 @@ $LOCAL-VARIABLES: (
 
 // @todo This definitely would need some IE love since it's flexbox and
 // driven by CSS variables so I'm just not displaying it in IE for now.
-.pfe-progress-stepper {
+.pfe-progress-steps {
   @include browser-query(ie11) {
     display: none;
   }

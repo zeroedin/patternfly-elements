@@ -1,10 +1,10 @@
 // Import polyfills: findIndex
-import "./polyfills--pfe-progress-stepper.js";
+import "./polyfills--pfe-progress-steps.js";
 import PFElement from "../../pfelement/dist/pfelement.js";
-import "./pfe-progress-stepper-item.js";
-class PfeProgressStepper extends PFElement {
+import "./pfe-progress-steps-item.js";
+class PfeProgressSteps extends PFElement {
   static get tag() {
-    return "pfe-progress-stepper";
+    return "pfe-progress-steps";
   }
 
   static get meta() {
@@ -16,11 +16,11 @@ class PfeProgressStepper extends PFElement {
   }
 
   get templateUrl() {
-    return "pfe-progress-stepper.html";
+    return "pfe-progress-steps.html";
   }
 
   get styleUrl() {
-    return "pfe-progress-stepper.scss";
+    return "pfe-progress-steps.scss";
   }
 
   // static get events() {
@@ -35,7 +35,7 @@ class PfeProgressStepper extends PFElement {
 
   static get properties() {
     return {
-      vertical: { type: Boolean, default: false, cascade: ["pfe-progress-stepper-item"] }
+      vertical: { type: Boolean, default: false, cascade: ["pfe-progress-steps-item"] }
     };
   }
 
@@ -44,7 +44,7 @@ class PfeProgressStepper extends PFElement {
   }
 
   constructor() {
-    super(PfeProgressStepper, { type: PfeProgressStepper.PfeType });
+    super(PfeProgressSteps, { type: PfeProgressSteps.PfeType });
   }
 
   connectedCallback() {
@@ -55,25 +55,25 @@ class PfeProgressStepper extends PFElement {
   disconnectedCallback() {}
 
   _build() {
-    const stepperItems = [...this.querySelectorAll("pfe-progress-stepper-item")];
+    const stepItems = [...this.querySelectorAll("pfe-progress-steps-item")];
     // find what child item has the active state
-    const activeItemIndex = stepperItems.findIndex(element => element.hasAttribute("current"));
+    const activeItemIndex = stepItems.findIndex(element => element.hasAttribute("current"));
     if (activeItemIndex >= 0) {
       // Calculate the width of the progress bar.
-      const width = (activeItemIndex / (stepperItems.length - 1)) * 100 + "%";
+      const width = (activeItemIndex / (stepItems.length - 1)) * 100 + "%";
       if (this.vertical) {
-        this.shadowRoot.querySelector(".pfe-progress-stepper__progress-bar-fill").style.height = width;
+        this.shadowRoot.querySelector(".pfe-progress-steps__progress-bar-fill").style.height = width;
       } else {
-        this.shadowRoot.querySelector(".pfe-progress-stepper__progress-bar-fill").style.width = width;
+        this.shadowRoot.querySelector(".pfe-progress-steps__progress-bar-fill").style.width = width;
       }
     }
 
     // Add spacing to the each of the items except for the top item
     // @todo we have to do it in javascript until everyone supports
-    // targeting siblings in :slotted. i.e. slot:slotted(pfe-progress-stepper-item + pfe-progress-stepper-item) { margin-top }
+    // targeting siblings in :slotted. i.e. slot:slotted(pfe-progress-steps-item + pfe-progress-steps-item) { margin-top }
     if (this.vertical) {
-      stepperItems.forEach((item, index) => {
-        if (index === stepperItems.length - 1) return;
+      stepItems.forEach((item, index) => {
+        if (index === stepItems.length - 1) return;
         // @todo this needs to bee dynamic
         item.style.minHeight = "75px";
       });
@@ -81,6 +81,6 @@ class PfeProgressStepper extends PFElement {
   }
 }
 
-PFElement.create(PfeProgressStepper);
+PFElement.create(PfeProgressSteps);
 
-export default PfeProgressStepper;
+export default PfeProgressSteps;

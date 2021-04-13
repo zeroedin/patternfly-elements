@@ -1,8 +1,8 @@
 import PFElement from "../../pfelement/dist/pfelement.js";
 
-class PfeProgressStepperItem extends PFElement {
+class PfeProgressStepsItem extends PFElement {
   static get tag() {
-    return "pfe-progress-stepper-item";
+    return "pfe-progress-steps-item";
   }
 
   static get meta() {
@@ -14,11 +14,11 @@ class PfeProgressStepperItem extends PFElement {
   }
 
   get templateUrl() {
-    return "pfe-progress-stepper-item.html";
+    return "pfe-progress-steps-item.html";
   }
 
   get styleUrl() {
-    return "pfe-progress-stepper-item.scss";
+    return "pfe-progress-steps-item.scss";
   }
 
   renderIcon() {
@@ -54,7 +54,7 @@ class PfeProgressStepperItem extends PFElement {
   }
 
   constructor() {
-    super(PfeProgressStepperItem, { type: PfeProgressStepperItem.PfeType });
+    super(PfeProgressStepsItem, { type: PfeProgressStepsItem.PfeType });
     this._hasLink = false;
   }
 
@@ -132,6 +132,6 @@ class PfeProgressStepperItem extends PFElement {
   }
 }
 
-PFElement.create(PfeProgressStepperItem);
+PFElement.create(PfeProgressStepsItem);
 
-export default PfeProgressStepperItem;
+export default PfeProgressStepsItem;

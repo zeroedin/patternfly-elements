@@ -3,13 +3,13 @@ import { withActions } from "@storybook/addon-actions";
 import * as bridge from "@storybook/addon-knobs";
 import * as tools from "../../../.storybook/utils.js";
 
-import PfeProgressStepper from "../dist/pfe-progress-stepper";
+import PfeProgressSteps from "../dist/pfe-progress-steps";
 
 const stories = storiesOf("Progress stepper", module);
 
 // Define the template to be used
 const template = (data = {}) => {
-  return tools.component(PfeProgressStepper.tag, data.prop, data.slots);
+  return tools.component(PfeProgressSteps.tag, data.prop, data.slots);
 };
 
 // Use these to get dynamically generated content
@@ -18,16 +18,16 @@ const defaultContent = tools.autoContent(1, 2);
 
 stories.addDecorator(bridge.withKnobs);
 
-stories.add(PfeProgressStepper.tag, () => {
+stories.add(PfeProgressSteps.tag, () => {
   let config = {};
-  const props = PfeProgressStepper.properties;
+  const props = PfeProgressSteps.properties;
 
   //-- Set any custom defaults just for storybook here
 
   // Trigger the auto generation of the knobs for attributes
-  config.prop = tools.autoPropKnobs(PfeProgressStepper);
+  config.prop = tools.autoPropKnobs(PfeProgressSteps);
 
-  const slots = PfeProgressStepper.slots;
+  const slots = PfeProgressSteps.slots;
 
   //-- Set any custom content for the slots here
 

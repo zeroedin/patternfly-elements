@@ -5,11 +5,11 @@ A component that gives the user a visual representation of the current state of 
 Describe how best to use this web component along with best practices.
 
 ```html
-<pfe-progress-stepper>
+<pfe-progress-steps>
     <!-- Default slot -->
-    <h2>This is pfe-progress-stepper</h2>
+    <h2>This is pfe-progress-steps</h2>
     
-</pfe-progress-stepper>
+</pfe-progress-steps>
 ```
 
 ### Accessibility
@@ -29,7 +29,7 @@ Available hooks for styling:
 
 | Variable name | Default value | Region |
 | --- | --- | --- |
-| `--pfe-pfe-progress-stepper--Color` | `#252527` | N/A |
+| `--pfe-pfe-progress-steps--Color` | `#252527` | N/A |
 
 ## Events
 Describe any events that are accessible external to the web component. There is no need to describe all the internal-only functions.
