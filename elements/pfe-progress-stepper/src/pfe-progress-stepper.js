@@ -62,7 +62,6 @@ class PfeProgressStepper extends PFElement {
       // Calculate the width of the progress bar.
       const width = (activeItemIndex / (stepperItems.length - 1)) * 100 + "%";
       if (this.vertical) {
-        console.log(width);
         this.shadowRoot.querySelector(".pfe-progress-stepper__progress-bar-fill").style.height = width;
       } else {
         this.shadowRoot.querySelector(".pfe-progress-stepper__progress-bar-fill").style.width = width;
