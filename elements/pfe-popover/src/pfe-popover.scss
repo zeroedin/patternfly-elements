@@ -32,6 +32,7 @@ $LOCAL-VARIABLES: (
     Right: #{$pf-spacer-sm},
     Position: absolute,
     Color: #{pf-color-black-500},
+    Fill: #6B6E74,
   ),
   arrow: (
     Width: 30px,
@@ -152,6 +153,7 @@ $LOCAL-VARIABLES: (
     position: pfe-local(Position, $region: closeButton);
     top: pfe-local(Top, $region: closeButton);
     right: pfe-local(Right, $region: closeButton);
+    fill: pfe-local(Fill, $region: closeButton);
     background-color: transparent;
     border-color: transparent;
     --pfe-icon--Color: var(--pfe-popover__close-button-color, #{$pf-color-black-500});
@@ -177,5 +179,5 @@ $LOCAL-VARIABLES: (
 :host([theme="dark"]) {
   --pfe-popover--Color: var(--pfe-popover--dark--Color, #{$pf-color-white});
   --pfe-popover--BackgroundColor: var(--pfe-popover--dark--BackgroundColor, #{$pf-color-black-900});
-  --pfe-popover__close-button--Color: var(--pfe-popover--dark__close-button--Color, white);
+  --pfe-popover__closeButton--Fill: var(--pfe-popover--dark__closeButton--Fill, white);
 }
