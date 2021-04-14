@@ -21,7 +21,6 @@ $LOCAL-VARIABLES: (
   ),
   header: (
     FontWeight: 500,
-    FontSize: 20px,
     MarginBottom: #{$pf-spacer-xs},
   ),
   footer: (
@@ -142,8 +141,8 @@ $LOCAL-VARIABLES: (
 
   > .pf-c-title,
   #header::slotted(*) {
+    @include pfe-typography(xl, $type: "title");
     font-weight: pfe-local(FontWeight, $region: header);
-    font-size: pfe-local(FontSize, $region: header);
     margin-top: 0;
     margin-bottom: pfe-local(MarginBottom, $region: header);
   }
