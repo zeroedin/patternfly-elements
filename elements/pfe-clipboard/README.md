@@ -150,3 +150,4 @@ Clipboard (and all PFElements) use [Prettier][prettier] to auto-format JS and JS
 [prettier]: https://github.com/prettier/prettier/
 [prettier-ed]: https://prettier.io/docs/en/editors.html
 [web-component-tester]: https://github.com/Polymer/web-component-tester
+
