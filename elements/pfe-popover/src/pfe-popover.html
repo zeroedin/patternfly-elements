@@ -6,7 +6,12 @@
     </button>
     <h1 class="pf-c-title pf-m-md" id="popover-top-header"><slot id="header" name="header"></slot></h1>
     <div class="pf-c-popover__body" id="popover-top-body"><slot name="body"></slot></div>
-    <footer class="pf-c-popover__footer"><slot name="footer"></slot></footer>
+    <footer class="pf-c-popover__footer">
+      <slot name="footer"></slot>
+      <div class="pf-c-popover__button-group">
+        <slot name="button-group"></slot>
+      </div>
+    </footer>
     <div class="pf-c-popover__focus-trap" tabindex="0"></div>
   </div>
 </div>

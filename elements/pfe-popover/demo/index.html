@@ -15,14 +15,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typebase.css/0.5.0/typebase.css">
     -->
-    
+
     <link rel="stylesheet" href="../../pfe-styles/dist/pfe-base.css" />
     <link rel="stylesheet" href="../../pfe-styles/dist/pfe-context.css" />
     <link rel="stylesheet" href="../../pfe-styles/dist/pfe-layouts.css" />
 
     <!-- uncomment the es5-adapter if you're using the umd version -->
     <script src="/examples/node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
-    
+
     <!-- Use webcomponents-loader when you are adding support for more modern browsers -->
     <!-- <script src="/examples/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script> -->
 
@@ -47,7 +47,6 @@
       }
       pfe-band {
         text-align: center;
-        
       }
       pfe-popover {
         text-align: left;
@@ -61,11 +60,9 @@
       <pfe-popover position="top" for="tooltip1">
         <div slot="header">Headline</div>
         <div slot="body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eleifend elit sed est egestas, a sollicitudin mauris tincidunt</div>
-        <div slot="footer">
-          <pfe-button><button>asdf</button></pfe-button>
-          <pfe-button variant="secondary"><button>asdf</button></pfe-button>
-          <pfe-cta variant="secondary" has_link><a href="#">asdf</a></pfe-cta>
-        </div>
+        <a slot="button-group" href="#">Button Link</a>
+        <a slot="button-group" href="#">Button Link</a>
+        <a slot="button-group" href="#">Button Link</a>
       </pfe-popover>
     </pfe-band>
     <pfe-band color="dark">
@@ -74,11 +71,8 @@
       <pfe-popover position="right" for="tooltip2">
         <div slot="header">Headline</div>
         <div slot="body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eleifend elit sed est egestas, a sollicitudin mauris tincidunt</div>
-        <div slot="footer">
-          <pfe-button><button>asdf</button></pfe-button>
-          <pfe-button variant="secondary"><button>asdf</button></pfe-button>
-          <pfe-cta variant="secondary" has_link><a href="#">asdf</a></pfe-cta>
-        </div>
+        <pfe-button slot="button-group"><button>asdf</button></pfe-button>
+        <pfe-button slot="button-group" variant="secondary"><button>asdf</button></pfe-button>
       </pfe-popover>
     </pfe-band>
     <pfe-band color="lightest">
@@ -87,11 +81,8 @@
       <pfe-popover position="bottom" for="tooltip3">
         <div slot="header">Headline</div>
         <div slot="body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eleifend elit sed est egestas, a sollicitudin mauris tincidunt</div>
-        <div slot="footer">
-          <pfe-button><button>asdf</button></pfe-button>
-          <pfe-button variant="secondary"><button>asdf</button></pfe-button>
-          <pfe-cta variant="secondary" has_link><a href="#">asdf</a></pfe-cta>
-        </div>
+        <pfe-button slot="button-group"><button>asdf</button></pfe-button>
+        <pfe-button slot="button-group" variant="secondary"><button>asdf</button></pfe-button>
       </pfe-popover>
     </pfe-band>
     <pfe-band color="dark">
@@ -100,11 +91,8 @@
       <pfe-popover position="left" for="tooltip4">
         <div slot="header">Headline</div>
         <div slot="body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eleifend elit sed est egestas, a sollicitudin mauris tincidunt</div>
-        <div slot="footer">
-          <pfe-button><button>asdf</button></pfe-button>
-          <pfe-button variant="secondary"><button>asdf</button></pfe-button>
-          <pfe-cta variant="secondary" has_link><a href="#">asdf</a></pfe-cta>
-        </div>
+        <pfe-button slot="button-group"><button>asdf</button></pfe-button>
+        <pfe-button slot="button-group" variant="secondary"><button>asdf</button></pfe-button>
       </pfe-popover>
     </pfe-band>
     <pfe-band color="lightest">
@@ -113,11 +101,8 @@
       <pfe-popover position="left" for="tooltip5" theme="dark">
         <div slot="header">Headline</div>
         <div slot="body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eleifend elit sed est egestas, a sollicitudin mauris tincidunt</div>
-        <div slot="footer">
-          <pfe-button><button>asdf</button></pfe-button>
-          <pfe-button variant="secondary"><button>asdf</button></pfe-button>
-          <pfe-cta variant="secondary" has_link><a href="#">asdf</a></pfe-cta>
-        </div>
+        <pfe-button slot="button-group"><button>asdf</button></pfe-button>
+        <pfe-button slot="button-group" variant="secondary"><button>asdf</button></pfe-button>
       </pfe-popover>
     </pfe-band>
 </html>
