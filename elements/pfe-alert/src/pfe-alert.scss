@@ -27,7 +27,6 @@ $LOCAL-VARIABLES: (
   ),
   title: (
     Color: #003737,
-    FontSize: 14px,
     FontWeight: 500,
   ),
   icon: (
@@ -37,6 +36,7 @@ $LOCAL-VARIABLES: (
     Height: var(--pfe-alert__icon--Size, 24px),
   ),
   description: (
+    FontWeight: 400,
     // probably switch this out for css grid
     MarginLeft: calc(var(--pfe-alert--Gap, 4px) + var(--pfe-alert__icon--Size, 24px)),
   ),
@@ -57,12 +57,12 @@ $LOCAL-VARIABLES: (
     Gap: 24px,
   ),
   action-group-item: (
+    FontWeight: 500,
     MarginRight: var(--pfe-alert__action-group--Gap, 24px),
     Padding: 0,
     border: none,
     BackgroundColor: transparent,
     Color: #0066CC,
-    FontSize: 14px,
   ),
   action-group-item--hover: (
     // blue-500
@@ -109,10 +109,9 @@ $LOCAL-VARIABLES: (
   }
 
   &__title {
-    font-size: pfe-local(FontSize, $region: title);
-    color: pfe-local(Color, $region: title);
-    font-size: pfe-local(FontSize, $region: title);
+    @include pfe-typography(lg, $type: "text", $base: false, $spacing: false);
     font-weight: pfe-local(FontWeight, $region: title);
+    color: pfe-local(Color, $region: title);
     flex: 1 1 auto;
   }
 
@@ -135,6 +134,8 @@ $LOCAL-VARIABLES: (
   }
 
   &__description {
+    @include pfe-typography(lg, $type: "text", $base: false, $spacing: false);
+    font-weight: pfe-local(FontWeight, $region: description);
     margin-left: pfe-local(MarginLeft, $region: description);
   }
 
@@ -147,12 +148,13 @@ $LOCAL-VARIABLES: (
 
 .pfe-alert__action-group-item,
 #action-group::slotted(.pfe-alert__action-group-item) {
+  @include pfe-typography(lg, $type: "text", $base: false, $spacing: false);
+  font-weight: pfe-local(FontWeight, $region: action-group-item);
   margin-right: pfe-local(MarginRight, $region: action-group-item);
   padding: pfe-local(Padding, $region: action-group-item);
   border: pfe-local(Border, $region: action-group-item);
   background-color: pfe-local(BackgroundColor, $region: action-group-item);
   color: pfe-local(Color, $region: action-group-item);
-  font-size: pfe-local(FontSize, $region: action-group-item);
 }
 .pfe-alert__action-group-item:hover,
 #action-group::slotted(.pfe-alert__action-group-item:hover) {
