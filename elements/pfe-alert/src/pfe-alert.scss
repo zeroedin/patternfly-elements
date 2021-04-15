@@ -49,6 +49,9 @@ $LOCAL-VARIABLES: (
     Height: var(--pfe-alert__close-button--Size, 24px),
     Width: var(--pfe-alert__close-button--Size, 24px),
   ),
+  close-button--hover: (
+    Color: #151515,
+  ),
   action-group: (
     MarginTop: var(--pfe-alert--Padding, 16px),
     MarginLeft: calc(var(--pfe-alert--Gap, 4px) + var(--pfe-alert__icon--Size, 24px)),
@@ -133,6 +136,13 @@ $LOCAL-VARIABLES: (
     width: pfe-local(Width, $region: close-button);
     height: pfe-local(Height, $region: close-button);
     cursor: pointer;
+
+    &:hover {
+      color: pfe-local(Width, $region: close-button--hover);
+    }
+    &:focus {
+      color: pfe-local(Width, $region: close-button--hover);
+    }
   }
 
   &__description {
