@@ -1,12 +1,18 @@
 {
-  "name": "@patternfly/pfe-avatar",
+  "name": "@patternfly/pfe-readtime",
+  "description": "Readtime element for PatternFly Elements",
   "pfelement": {
-    "className": "PfeAvatar",
-    "elementName": "pfe-avatar",
-    "preview": "squares.png"
+    "className": "PfeReadtime",
+    "elementName": "pfe-readtime",
+    "preview": "readtime.png",
+    "files": {
+      "styles": "./src/pfe-readtime.scss",
+      "template": "./src/pfe-readtime.html",
+      "js": "./src/pfe-readtime.js"
+    },
+    "assets": []
   },
   "version": "1.5.0",
-  "description": "Avatar for PatternFly Elements",
   "keywords": [
     "web-components",
     "html"
@@ -14,7 +20,7 @@
   "repository": {
     "type": "git",
     "url": "github:patternfly/patternfly-elements",
-    "directory": "elements/pfe-avatar"
+    "directory": "elements/pfe-readtime"
   },
   "engines": {
     "node": ">=10 <13"
@@ -28,9 +34,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./dist/pfe-avatar.umd.js",
-  "module": "./dist/pfe-avatar.js",
-  "unpkg": "./dist/pfe-avatar.umd.min.js",
+  "main": "./dist/pfe-readtime.umd.js",
+  "module": "./dist/pfe-readtime.js",
+  "unpkg": "./dist/pfe-readtime.umd.min.js",
   "files": [
     "dist"
   ],
@@ -38,20 +44,16 @@
     "build": "../../node_modules/.bin/gulp && ../../node_modules/.bin/prettier --ignore-path ../../.prettierignore --write '**/*.{js,json}'",
     "dev": "../../node_modules/.bin/gulp dev",
     "watch": "../../node_modules/.bin/gulp watch",
-    "test": "../../node_modules/.bin/wct --configFile ../../wct.conf.json elements/pfe-avatar/test/"
+    "test": "../../node_modules/.bin/wct --configFile ../../wct.conf.json elements/pfe-readtime/test/"
   },
   "contributors": [
     {
-      "name": "Michael Clayton"
+      "name": "Adam Lazzara"
     }
   ],
   "license": "MIT",
   "dependencies": {
-    "@patternfly/pfe-sass": "^1.5.0",
-    "@patternfly/pfelement": "^1.5.0"
-  },
-  "generator-pfelement-version": "0.6.8",
-  "bugs": {
-    "url": "https://github.com/patternfly/patternfly-elements/issues"
+    "@patternfly/pfelement": "^1.5.0",
+    "gh-pages": "^2.2.0"
   }
 }
