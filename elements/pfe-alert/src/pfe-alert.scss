@@ -22,6 +22,9 @@ $LOCAL-VARIABLES: (
     MarginBottom: var(--pfe-alert--Gap, 4px),
     MarginLeft: var(--pfe-alert--Gap, 4px),
   ),
+  headerActions: (
+    MarginRight: 4px,
+  ),
   title: (
     Color: #003737,
     FontSize: 14px,
@@ -99,6 +102,10 @@ $LOCAL-VARIABLES: (
     justify-content: flex-start;
     margin-bottom: pfe-local(MarginBottom, $region: header);
     margin-left: pfe-local(MarginLeft, $region: header);
+  }
+
+  &__header-actions {
+    margin-right: pfe-local(MarginRight, $region: headerActions);
   }
 
   &__title {
