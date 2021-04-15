@@ -39,6 +39,7 @@ $LOCAL-VARIABLES: (
   description: (
     // probably switch this out for css grid
     MarginLeft: calc(var(--pfe-alert--Gap, 4px) + var(--pfe-alert__icon--Size, 24px)),
+    FontSize: 14px,
   ),
   close-button: (
     // Black-600
@@ -135,6 +136,7 @@ $LOCAL-VARIABLES: (
   }
 
   &__description {
+    font-size: pfe-local(FontSize, $region: description);
     margin-left: pfe-local(MarginLeft, $region: description);
   }
 
