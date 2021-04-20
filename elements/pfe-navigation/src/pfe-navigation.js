@@ -206,6 +206,19 @@ class PfeNavigation extends PFElement {
     // Close All Red Hat menu and go back to mobile menu
     this._allRedHatToggleBack.addEventListener("click", this._allRedHatToggleBackClickHandler);
 
+    // Close all menus if any are open once the navigation loses focus
+    console.log(this._shadowDomOuterWrapper);
+    this._shadowDomOuterWrapper.addEventListener("focusout", () => {
+      console.log("ugh");
+    });
+
+    //this._a11yGetLastFocusableElement(this._shadowNavWrapper);
+    //console.log(this._lastFocusableNavElement);
+
+    // Tab key listener attached to the last focusable element in the component
+    //this._lastFocusableNavElement.addEventListener("keydown", this._a11yCloseAllMenus);
+    //console.log(this._lastFocusableNavElement);
+
     // Ensure we close the whole menu and hide the overlay when the overlay is clicked
     this._overlay.addEventListener("click", this._overlayClickHandler);
 
@@ -349,8 +362,8 @@ class PfeNavigation extends PFElement {
     this._allRedHatToggleBack.removeEventListener("click", this._allRedHatToggleBackClickHandler);
     this.removeEventListener("keydown", this._generalKeyboardListener);
 
-    // this._a11yGetLastFocusableElement(this._shadowNavWrapper);
-    // this._lastFocusableNavElement.removeEventListener("keydown", this._a11yCloseAllMenus);
+    //this._a11yGetLastFocusableElement(this._shadowNavWrapper);
+    //this._lastFocusableNavElement.removeEventListener("keydown", this._a11yCloseAllMenus);
 
     if (this._siteSwitcherMobileOnly !== null) {
       this._siteSwitcherMobileOnly.removeEventListener("keydown", this._a11ySiteSwitcherFocusHandler);
@@ -1834,18 +1847,18 @@ class PfeNavigation extends PFElement {
      *  A11y adjustments for screem readers and keyboards on screen resize
      **/
     // Get last focusable element for nav
-    // this._a11yGetLastFocusableElement(this._shadowNavWrapper);
-    // console.log(this._lastFocusableNavElement);
+    //this._a11yGetLastFocusableElement(this._shadowNavWrapper);
+    //console.log(this._lastFocusableNavElement);
 
-    // // Tab key listener attached to the last focusable element in the component
-    // this._lastFocusableNavElement.addEventListener("keydown", this._a11yCloseAllMenus);
-    // console.log("end _postResizeAdjustments" + this._lastFocusableNavElement);
+    // Tab key listener attached to the last focusable element in the component
+    //this._lastFocusableNavElement.addEventListener("keydown", this._a11yCloseAllMenus);
+    //console.log("end _postResizeAdjustments" + this._lastFocusableNavElement);
 
-    // // Only run if mobile site switcher is NOT null (mobile - md breakpoints)
-    // if (this._siteSwitcherMobileOnly !== null) {
-    //   // Key listener attached to the last focusable element in the mobile site switcher menu
-    //   this._siteSwitcherMobileOnly.addEventListener("keydown", this._a11ySiteSwitcherFocusHandler);
-    // }
+    // Only run if mobile site switcher is NOT null (mobile - md breakpoints)
+    if (this._siteSwitcherMobileOnly !== null) {
+      // Key listener attached to the last focusable element in the mobile site switcher menu
+      this._siteSwitcherMobileOnly.addEventListener("keydown", this._a11ySiteSwitcherFocusHandler);
+    }
   } // end _postResizeAdjustments()
 
   /**
@@ -2036,7 +2049,6 @@ class PfeNavigation extends PFElement {
   _a11yCloseAllMenus(event) {
     const openToggleId = this.getAttribute(`${this.tag}-open-toggle`);
     const key = event.key;
-    console.log("a11yClosing!!!");
 
     // @todo: (KS) change to using logout inside of user-menu as the last element to blur from to close the menu
     // If the login link is present still use that to blur and close the menu
@@ -2055,6 +2067,7 @@ class PfeNavigation extends PFElement {
           this._changeNavigationState(openToggleId, "close");
         }
 
+        console.log("a11yClosing!!!");
         return true;
       }
     }
@@ -2069,13 +2082,7 @@ class PfeNavigation extends PFElement {
     // Store all focusable elements inside variable
     this._focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-    const logoutLink = this.shadowRoot.querySelector(".account-metadata__logout-wrapper a");
-    console.log(logoutLink);
-
-    // console.log(this._accountOuterWrapper);
-    // console.log(accountLoggedIn);
-    // console.log(this._accountToggle);
-    // console.log(this._accountLogInLink);
+    //const logoutLink = this._accountComponent.shadowRoot.querySelector(".account-metadata__logout-wrapper a");
 
     // Logic switch for Site Switcher nav versus main nav
     // Check if nav region is the site switcher
@@ -2089,37 +2096,83 @@ class PfeNavigation extends PFElement {
         this._lastFocusElementSiteSwitcher = this._siteSwitcherFocusElements[
           this._siteSwitcherFocusElements.length - 1
         ];
+
         console.log(this._lastFocusElementSiteSwitcher);
         return this._lastFocusElementSiteSwitcher;
       }
     }
 
+    // if (navRegion === this._shadowDomOuterWrapper) {
+    //   this._focusableNavContent = this.shadowRoot.querySelectorAll(this._focusableElements);
+
+    //   // Get the last focusable elements of Nav and All Red Hat sub menu
+    //   this._lastFocusableNavElement = this._focusableNavContent[this._focusableNavContent.length - 1];
+
+    //   console.log(this._lastFocusableNavElement);
+
+    //   return this._lastFocusableNavElement;
+    // }
+
+    // console.log(this.shadowRoot.getElementById(`${this.tag}--custom-links`));
+    // console.log(this._customLinksSlot.assignedElements());
+
+    // check this._customLinksSlot.assignedElements()
+    // if it has a length, use the last item
+    // if (this._customLinksSlot.assignedElements().length !== 0) {
+    //   const customLinksElements = this._customLinksSlot.assignedElements();
+
+    //   this._lastFocusableNavElement = customLinksElements[customLinksElements.length - 1];
+
+    //   console.log(this._lastFocusableNavElement);
+    //   return this._lastFocusableNavElement;
+    // }
+
     // Check if nav region is the main menu
     if (navRegion === this._shadowNavWrapper) {
-      // this._focusableNavContent = this.shadowRoot.querySelectorAll(this._focusableElements);
-      // // Get the last focusable elements of Nav and All Red Hat sub menu
-      // this._lastFocusableNavElement = this._focusableNavContent[this._focusableNavContent.length - 1];
-      // console.log(this._lastFocusableNavElement);
-      // return this._lastFocusableNavElement;
+      this._focusableNavContent = this._shadowDomOuterWrapper.querySelectorAll(this._focusableElements);
+
+      console.log(this._focusableNavContent);
+
+      // Get the last focusable elements of Nav and All Red Hat sub menu
+      this._lastFocusableNavElement = this._focusableNavContent[this._focusableNavContent.length - 1];
+
+      console.log(this._lastFocusableNavElement);
+
+      return this._lastFocusableNavElement;
 
       // @todo: need to make sure all red hat menu will always be there, if not then we need to fallback to a different last link
       // login link or login toggle will always be the last item in the black bar nav
       // pfe-navigation__account-wrapper pfe-navigation__account-wrapper--logged-in
       // first check for logged in class if so use if so use .pfe-navigation__account-toggle
 
-      if (this._accountOuterWrapper.classList.contains("pfe-navigation__account-wrapper--logged-in")) {
-        this._lastFocusableNavElement = logoutLink;
-        // console.log(logoutLink);
+      // if logged in, see if pfe-navigation__log-out-link exists
+      /// that would be the last item
+      // if (this._accountOuterWrapper.classList.contains("pfe-navigation__account-wrapper--logged-in")) {
+      //   this._lastFocusableNavElement = logoutLink;
 
-        return this._lastFocusableNavElement;
-      } else {
-        this._lastFocusableNavElement = this._accountLogInLink;
-        return this._lastFocusableNavElement;
-      }
+      //   // console.log(this._lastFocusableNavElement);
+      //   return this._lastFocusableNavElement;
+
+      // } else {
+      //   // if not logged in, see if pfe-navigation__log-in-link exists
+      //   /// that would be the last item
+      //   this._lastFocusableNavElement = this._accountLogInLink;
+
+      //   // console.log(this._lastFocusableNavElement);
+      //   return this._lastFocusableNavElement;
+      // }
+
+      //console.log(this._shadowNavWrapper);
+
+      // console.log(this._customLinksSlot);
+      //console.log(customLinksSlotLength);
+
+      // this.getSlot('pfe-navigation--custom-links');
 
       // if () {
 
       // }
+
       // if not logged in, see if pfe-navigation__log-in-link exists
       /// that would be the last item
       // next check this._customLinksSlot.assignedElements()
@@ -2398,6 +2451,17 @@ class PfeNavigation extends PFElement {
         }
       }
     }
+
+    // @todo: KS - decide if we need this
+    if (this._accountComponent.hasAttribute("pfe-navigation-account-ready")) {
+      /**
+       *  A11y adjustments for screen readers and keyboards
+       **/
+      // Get last focusable element for nav
+      //this._a11yGetLastFocusableElement(this._shadowNavWrapper);
+      // Tab key listener attached to the last focusable element in the component
+      //this._lastFocusableNavElement.addEventListener("keydown", this._a11yCloseAllMenus);
+    }
   }
 
   /**
@@ -2423,14 +2487,15 @@ class PfeNavigation extends PFElement {
         }
       }
 
+      // @todo: KS - decide if we need this
       /**
        *  A11y adjustments for screen readers and keyboards
        **/
       // Get last focusable element for nav
-      // this._a11yGetLastFocusableElement(this._shadowNavWrapper);
+      //this._a11yGetLastFocusableElement(this._shadowNavWrapper);
 
-      // // Tab key listener attached to the last focusable element in the component
-      // this._lastFocusableNavElement.addEventListener("keydown", this._a11yCloseAllMenus);
+      // Tab key listener attached to the last focusable element in the component
+      //this._lastFocusableNavElement.addEventListener("keydown", this._a11yCloseAllMenus);
     } else {
       this._accountOuterWrapper.hidden = true;
     }
