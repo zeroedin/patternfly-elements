@@ -309,8 +309,7 @@ class PFElement extends HTMLElement {
     // Priority order for context values to be pulled from:
     //--> 1. context (OLD: pfe-theme)
     //--> 2. --context (OLD: --theme)
-    let value = this.context || this.contextVariable || fallback;
-    this.on = value;
+    this.on = this.context || this.contextVariable || fallback;
   }
 
   constructor(pfeClass, { type = null, delayRender = false } = {}) {

@@ -219,22 +219,24 @@ suite('<pfe-content-set>', () => {
         const tabBand = document.querySelector("#band");
         const contentSet = tabBand.querySelector("pfe-content-set");
 
-        const tabs = contentSet.view;
-        const tab = tabs.querySelector("pfe-tab");
-        const panel = tabs.querySelector("pfe-tab-panel");
+        Promise.all([customElements.whenDefined("pfe-content-set")]).then(() => {
+          const tabs = contentSet.view;
+          const tab = tabs.querySelector("pfe-tab");
+          const panel = tabs.querySelector("pfe-tab-panel");
 
-        [tabBand, contentSet, tabs, tab, panel].forEach(region => {
-          assert.equal(region.getAttribute("on"), "dark");
-        });
-
-        tabBand.removeAttribute("color");
-
-        flush(() => {
           [tabBand, contentSet, tabs, tab, panel].forEach(region => {
-            assert.equal(region.getAttribute("on"), "light");
+            assert.equal(region.getAttribute("on"), "dark");
           });
 
-          done();
+          tabBand.removeAttribute("color");
+
+          flush(() => {
+            [tabBand, contentSet, tabs, tab, panel].forEach(region => {
+              assert.equal(region.getAttribute("on"), "light");
+            });
+
+            done();
+          });
         });
 
       });
