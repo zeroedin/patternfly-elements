@@ -49,7 +49,7 @@ jobs:
   #   steps:
   #     - name: Debugging context variables
   #       run: echo "$GITHUB_CONTEXT"
-  build:
+  build-pr:
     name: Compile project
     outputs:
       CACHE_KEY: ${{ steps.hash.outputs.HASH }}
@@ -61,18 +61,21 @@ jobs:
     if: |
       (
         github.event_name == 'pull_request' &&
-        github.event.action == 'labeled' &&
-        (github.event.label.name == 'run e2e' || github.event.label.name == 'ready to merge')
+        (
+          github.event.action == 'labeled' &&
+          (
+            github.event.label.name == 'run e2e' ||
+            github.event.label.name == 'ready to merge'
+          )
+        ) ||
+        (
+          github.event.action != 'labeled' &&
+          github.event.pull_request.draft == false &&
+          !contains(github.event.pull_request.labels.*.name, 'blocked') &&
+          !contains(github.event.pull_request.labels.*.name, 'skip ci')
+        ) 
       ) ||
-      (
-        github.event_name == 'pull_request' &&
-        github.event.action != 'labeled' &&
-        github.event.pull_request.draft == false &&
-        !contains(github.event.pull_request.labels.*.name, 'blocked') &&
-        !contains(github.event.pull_request.labels.*.name, 'skip ci')
-      ) ||
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push'
+      github.event_name != 'pull_request'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -115,6 +118,69 @@ jobs:
           path: elements/*/dist/*
           if-no-files-found: error
 
+  build-base:
+    name: Run build on the master branch
+    runs-on: ubuntu-latest
+    outputs:
+      CACHE_KEY: ${{ steps.hash.outputs.HASH }}
+    strategy:
+      matrix:
+        node: ['12.x']
+    if: |
+      github.event_name != 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: master
+          ref: master
+
+      - name: Capture hash value
+        id: hash
+        run: echo '::set-output name=HASH::${{ runner.os }}-npm-${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}'
+
+      # Configures the node version used on GitHub-hosted runners
+      - name: Configure node version
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      # Caching speeds up the npm install step
+      - name: Cache node modules
+        id: cache
+        uses: actions/cache@v2
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: |
+            ~/.npm
+            **/node_modules
+            ~/.cache/ms-playwright
+          key: ${{ steps.hash.outputs.HASH }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Build
+        id: build
+        run: npm run build
+
+      # Upload compiled temp assets to make them available for downstream jobs
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: compiled-master-temp
+          path: elements/*/_temp/*
+          if-no-files-found: error
+
+      # Upload compiled assets to make them available for downstream jobs
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: compiled-master-dist
+          path: elements/*/dist/*
+          if-no-files-found: error
+  
   # Test command can run concurrent with e2e and test-wtr so it downloads the
   # compiled assets from the build and uses those instead of reinstalling.
   test:
