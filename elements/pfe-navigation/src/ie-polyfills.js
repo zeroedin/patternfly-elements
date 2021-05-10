@@ -51,7 +51,6 @@
       value: function prepend() {
         var argArr = Array.prototype.slice.call(arguments),
           docFrag = document.createDocumentFragment();
-
         argArr.forEach(function(argItem) {
           var isNode = argItem instanceof Node;
           docFrag.appendChild(isNode ? argItem : document.createTextNode(String(argItem)));
@@ -110,5 +109,17 @@ if (!Element.prototype.closest) {
       el = el.parentElement || el.parentNode;
     } while (el !== null && el.nodeType === 1);
     return null;
+  };
+}
+
+if (Element.prototype.getAttributeNames == undefined) {
+  Element.prototype.getAttributeNames = function() {
+    var attributes = this.attributes;
+    var length = attributes.length;
+    var result = new Array(length);
+    for (var i = 0; i < length; i++) {
+      result[i] = attributes[i].name;
+    }
+    return result;
   };
 }

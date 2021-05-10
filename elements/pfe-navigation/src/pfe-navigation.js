@@ -297,7 +297,7 @@ class PfeNavigation extends PFElement {
     };
 
     // @todo Shouldn't go live with this line, but need to debug
-    PFElement._debugLog = true;
+    // PFElement._debugLog = true;
     // this.log = (...msgs) => console.log(...msgs);
   } // ends constructor()
 
@@ -383,10 +383,10 @@ class PfeNavigation extends PFElement {
     }
 
     if (this._menuBreakpointQueries.secondaryLinks) {
-      this._menuBreakpointQueries.secondaryLinks.removeEventListener("change", this._collapseMainMenu);
+      this._removeMediaQueryListener(this._menuBreakpointQueries.secondaryLinks, this._collapseSecondaryLinks);
     }
     if (this._menuBreakpointQueries.mainMenu) {
-      this._menuBreakpointQueries.mainMenu.removeEventListener("change", this._collapseMainMenu);
+      this._removeMediaQueryListener(this._menuBreakpointQueries.mainMenu, this._collapseMainMenu);
     }
 
     if (this.hasAttribute("pfe-sticky") && this.getAttribute("pfe-sticky") != "false") {
@@ -408,6 +408,32 @@ class PfeNavigation extends PFElement {
   // Process the attribute change
   attributeChangedCallback(attr, oldValue, newValue) {
     super.attributeChangedCallback(attr, oldValue, newValue);
+  }
+
+  /**
+   * Utility function to polyfill media query listeners
+   */
+  _addMediaQueryListener(mediaQueryObject, eventHandler) {
+    if (mediaQueryObject && typeof mediaQueryObject.addEventListener !== "undefined") {
+      mediaQueryObject.addEventListener("change", eventHandler);
+    }
+    // @note IE Support
+    else if (mediaQueryObject && typeof mediaQueryObject.addListener === "function") {
+      mediaQueryObject.addListener(eventHandler);
+    }
+  }
+
+  /**
+   * Utility function to polyfill media query listeners
+   */
+  _removeMediaQueryListener(mediaQueryObject, eventHandler) {
+    if (mediaQueryObject && typeof mediaQueryObject.removeEventListener !== "undefined") {
+      mediaQueryObject.removeEventListener("change", eventHandler);
+    }
+    // @note IE Support
+    else if (mediaQueryObject && typeof mediaQueryObject.removeListener === "function") {
+      mediaQueryObject.removeListener(eventHandler);
+    }
   }
 
   /**
@@ -1153,8 +1179,9 @@ class PfeNavigation extends PFElement {
             }
           };
 
-          const alertsObserver = new MutationObserver(observerCallback);
-          alertsObserver.observe(pfeNavigationDropdown, { attributeFilter: ["pfe-alerts"] });
+          // @todo Causes issues in IE11
+          // const alertsObserver = new MutationObserver(observerCallback);
+          // alertsObserver.observe(pfeNavigationDropdown, { attributeFilter: ["pfe-alerts"] });
 
           // Process Site Switcher Dropdown
           if (toggleAndDropdownWrapper.classList.contains("pfe-navigation__site-switcher")) {
@@ -1214,7 +1241,21 @@ class PfeNavigation extends PFElement {
     let cancelLightDomProcessing = true;
     let componentClassesChange = false;
     let recalculateMenuBreakpoints = false;
-    const ignoredTags = ["PFE-NAVIGATION", "PFE-ICON", "PFE-NAVIGATION-DROPDOWN"];
+    const ignoredTags = ["PFE-NAVIGATION", "PFE-ICON", "PFE-NAVIGATION-DROPDOWN", "PFE-CTA"];
+    if (mutationList) {
+      for (let index = 0; index < mutationList.length; index++) {
+        const mutation = mutationList[index];
+        if (mutation.type === "childList") {
+          if (mutation.addedNodes.length) {
+            console.log(index, mutation.addedNodes[0]);
+          } else {
+            console.log(index, mutation.removedNodes[0]);
+          }
+        } else {
+          console.log(index, mutation.type);
+        }
+      }
+    }
 
     // On initialization
     if (!mutationList) {
@@ -1235,9 +1276,9 @@ class PfeNavigation extends PFElement {
         let ignoreThisMutation = false;
 
         if (mutationItem.type === "childList") {
+          const customDropdownsToProcess = [];
           for (let index = 0; index < mutationItem.addedNodes.length; index++) {
             const addedNode = mutationItem.addedNodes[index];
-            const customDropdownsToProcess = [];
             if (
               addedNode.nodeType === 1 &&
               addedNode.hasAttribute("slot") &&
@@ -1252,16 +1293,19 @@ class PfeNavigation extends PFElement {
                   break;
               }
             }
-            this._processCustomDropdowns(customDropdownsToProcess);
 
             // Recalculate both breakpoints
             this._menuBounds.mainMenuRight = null;
             this._menuBounds.secondaryLinksLeft = null;
             recalculateMenuBreakpoints = true;
           }
+          // @todo Handle removed nodes
           // for (let index = 0; index < mutationItem.removedNodes.length; index++) {
           //   const removedNode = mutationItem.removedNodes[index];
           // }
+          if (customDropdownsToProcess.length) {
+            this._processCustomDropdowns(customDropdownsToProcess);
+          }
         }
 
         // Capture any changes to pfe-navigation copy those classes shadow DOM wrapper
@@ -1338,7 +1382,6 @@ class PfeNavigation extends PFElement {
       }
 
       this.log("Cancelled light DOM processing", mutationList);
-
       return;
     }
 
@@ -1538,6 +1581,10 @@ class PfeNavigation extends PFElement {
       // Modify elements when they're in the shadow vars before they get appended to the shadow DOM
       //--------------------------------------------------
 
+      // Preventing issues in IE11 & Edge
+      if (window.ShadyCSS) {
+        this._observer.disconnect();
+      }
       // Add attributres we need on the shadow DOM menu wrapper
       newShadowMenuWrapper.setAttribute("id", "pfe-navigation__menu-wrapper");
       newShadowMenuWrapper.classList.add("pfe-navigation__menu-wrapper");
@@ -1685,7 +1732,10 @@ class PfeNavigation extends PFElement {
         this._addCloseDropdownAttributes(dropdownWrapper);
       }
     }
-
+    // Preventing issues in IE11 & Edge
+    if (window.ShadyCSS) {
+      this._observer.disconnect();
+    }
     // Set initial on page load aria settings on all original buttons and their dropdowns
     this._addCloseDropdownAttributes(this._mobileToggle, this._currentMobileDropdown);
     this._addCloseDropdownAttributes(this._searchToggle, this._searchSpotMd);
@@ -1694,10 +1744,6 @@ class PfeNavigation extends PFElement {
 
     // Make sure search slot is in the right spot, based on breakpoint
     this._moveSearchSlot();
-    // Reconnecting mutationObserver for IE11 & Edge
-    if (window.ShadyCSS) {
-      this._observer.observe(this, lightDomObserverConfig);
-    }
 
     // Timeout lets these run a little later
     if (recalculateMenuBreakpoints) {
@@ -1718,19 +1764,19 @@ class PfeNavigation extends PFElement {
       if (this.isMobileMenuButtonVisible() && !this.isOpen("mobile__button")) {
         this._addCloseDropdownAttributes(this._mobileToggle, this._currentMobileDropdown);
       }
-      const mobileSliderElements = this.querySelectorAll("[mobile-slider]");
-      for (let index = 0; index < mobileSliderElements.length; index++) {
-        const currentMobileSliderElement = mobileSliderElements[index];
-        this._getLastFocusableItemInMobileSlider(currentMobileSliderElement);
-        const toggle = currentMobileSliderElement.querySelector(".pfe-navigation__custom-link");
-        const dropdown = currentMobileSliderElement.querySelector(".pfe-navigation__dropdown");
-        if (toggle && toggle.id && dropdown) {
-          this._mobileSliderMutationObservers[toggle.id] = new MutationObserver(() =>
-            this._getLastFocusableItemInMobileSlider(currentMobileSliderElement)
-          );
-          this._mobileSliderMutationObservers[toggle.id].observe(dropdown, { subtree: true, childList: true });
-        }
-      }
+      // const mobileSliderElements = this.querySelectorAll("[mobile-slider]");
+      // for (let index = 0; index < mobileSliderElements.length; index++) {
+      //   const currentMobileSliderElement = mobileSliderElements[index];
+      //   this._getLastFocusableItemInMobileSlider(currentMobileSliderElement);
+      //   const toggle = currentMobileSliderElement.querySelector(".pfe-navigation__custom-link");
+      //   const dropdown = currentMobileSliderElement.querySelector(".pfe-navigation__dropdown");
+      //   if (toggle && toggle.id && dropdown) {
+      //     this._mobileSliderMutationObservers[toggle.id] = new MutationObserver(() =>
+      //       this._getLastFocusableItemInMobileSlider(currentMobileSliderElement)
+      //     );
+      //     this._mobileSliderMutationObservers[toggle.id].observe(dropdown, { subtree: true, childList: true });
+      //   }
+      // }
 
       // Reconnecting mutationObserver for IE11 & Edge
       if (window.ShadyCSS) {
@@ -1738,12 +1784,17 @@ class PfeNavigation extends PFElement {
       }
     };
 
-    // Add custom event for interactive elements in shadowDom so anayltics can capture them acccurately
+    // Add custom event for interactive elements in shadowDom so analytics can capture them acccurately
     const interactiveShadowDomElements = this.shadowRoot.querySelectorAll(this._focusableElements);
     for (let index = 0; index < interactiveShadowDomElements.length; index++) {
       interactiveShadowDomElements[index].addEventListener("click", this._shadowDomInteraction);
     }
     window.setTimeout(postProcessLightDom, 10);
+
+    // Reconnecting mutationObserver for IE11 & Edge
+    if (window.ShadyCSS) {
+      this._observer.observe(this, lightDomObserverConfig);
+    }
   } // end _processLightDom()
 
   /**
@@ -1828,7 +1879,11 @@ class PfeNavigation extends PFElement {
         // Gets the length from the right edge of the screen to the left side of the left most secondary link
         secondaryLinksLeft = window.innerWidth - Math.ceil(leftMostSecondaryLinkBoundingRect.left);
       }
-      if (secondaryLinksLeft && secondaryLinksLeft !== this._menuBounds.secondaryLinksLeft) {
+      if (
+        leftMostSecondaryLinkBoundingRect &&
+        secondaryLinksLeft &&
+        secondaryLinksLeft !== this._menuBounds.secondaryLinksLeft
+      ) {
         this._menuBounds.secondaryLinksLeft = window.innerWidth - Math.ceil(leftMostSecondaryLinkBoundingRect.left);
         recreateMediaQueries = true;
       }
@@ -1846,11 +1901,10 @@ class PfeNavigation extends PFElement {
 
         // Remove old listener
         if (this._menuBreakpointQueries.mainMenu) {
-          this._menuBreakpointQueries.mainMenu.removeEventListener("change", this._collapseMainMenu);
+          this._removeMediaQueryListener(this._menuBreakpointQueries.mainMenu, this._collapseMainMenu);
         }
         // Create new one
-        this._menuBreakpointQueries.mainMenu = window.matchMedia(`(max-width: ${this.menuBreakpoints.mainMenu}px)`);
-        this._menuBreakpointQueries.mainMenu.addEventListener("change", this._collapseMainMenu);
+        this._addMediaQueryListener(this._menuBreakpointQueries.mainMenu, this._collapseMainMenu);
       }
     }
 
@@ -1860,13 +1914,13 @@ class PfeNavigation extends PFElement {
 
       // Remove old listener
       if (this._menuBreakpointQueries.secondaryLinks) {
-        this._menuBreakpointQueries.secondaryLinks.removeEventListener("change", this._collapseMainMenu);
+        this._removeMediaQueryListener(this._menuBreakpointQueries.secondaryLinks, this._collapseSecondaryLinks);
       }
       // Create new listener
       this._menuBreakpointQueries.secondaryLinks = window.matchMedia(
         `(max-width: ${this.menuBreakpoints.secondaryLinks}px)`
       );
-      this._menuBreakpointQueries.secondaryLinks.addEventListener("change", this._collapseSecondaryLinks);
+      this._addMediaQueryListener(this._menuBreakpointQueries.secondaryLinks, this._collapseSecondaryLinks);
     }
 
     this.log("Menu Bounds updated, updating mediaQueries", {
@@ -2470,7 +2524,7 @@ class PfeNavigation extends PFElement {
 
         // Reconnecting mutationObserver for IE11 & Edge
         if (window.ShadyCSS && this._mobileSliderMutationObservers[toggle.id]) {
-          this._mobileSliderMutationObservers[toggle.id].observe(dropdown, { subtree: true, childList: true });
+          // this._mobileSliderMutationObservers[toggle.id].observe(dropdown, { subtree: true, childList: true });
         }
       }
     } else {
