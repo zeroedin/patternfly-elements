@@ -1,0 +1,58 @@
+{
+  "name": "@patternfly/pfe-foo",
+  "description": "Foo element for PatternFly Elements",
+  "pfelement": {
+    "className": "PfeFoo",
+    "elementName": "pfe-foo",
+    "files": {
+      "styles": "./src/pfe-foo.scss",
+      "template": "./src/pfe-foo.html",
+      "js": "./src/pfe-foo.js"
+    },
+    "assets": []
+  },
+  "version": "1.7.0",
+  "keywords": [
+    "web-components",
+    "html"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "github:patternfly/patternfly-elements",
+    "directory": "elements/pfe-foo"
+  },
+  "engines": {
+    "node": ">=10 <13"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "Firefox >= 78",
+    "iOS >= 8",
+    "ie 11"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/pfe-foo.umd.js",
+  "module": "./dist/pfe-foo.js",
+  "unpkg": "./dist/pfe-foo.umd.min.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "../../node_modules/.bin/gulp && ../../node_modules/.bin/prettier --ignore-path ../../.prettierignore --write '**/*.{js,json}'",
+    "dev": "../../node_modules/.bin/gulp dev",
+    "watch": "../../node_modules/.bin/gulp watch",
+    "test": "echo \"👉 Run tests from the project root with 'npm run test:watch --element=pfe-foo'\""
+  },
+  "contributors": [
+    {
+      "name": "heyMP"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@patternfly/pfelement": "1.7.0",
+    "@patternfly/pfe-sass": "1.7.0"
+  }
+}

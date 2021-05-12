@@ -1,0 +1,26 @@
+// Please see the pfe-sass README for guidance on using these tools
+@import "../../pfe-sass/pfe-sass";
+
+
+$LOCAL: foo;
+
+// Example local variable, using BEM format
+// --pfe-foo__region--Property: value;
+
+// This variable is global so that helper functions can reference it
+$LOCAL-VARIABLES: ();
+
+:host {
+  // Avoid printing local variables on host, instead use the pfe-local() function to set property values
+  // Example: color: pfe-local(Color);
+  display: block;
+  --size: 50px;
+  --size-radius: calc(var(--size) / 2);
+  --offset: 10px;
+  margin-right: calc(var(--size-radius) + var(--offset));
+}
+
+:host([hidden]) {
+  display: none;
+}
+

@@ -60,6 +60,8 @@ module.exports = function factory({
   const autoprefixer = require("autoprefixer");
   const cleanCSS = require("gulp-clean-css");
   const postcssCustomProperties = require("postcss-custom-properties");
+  const postcssCalc = require("postcss-calc");
+  const postcssCSSVariables = require("postcss-css-variables");
 
   // Markup
   const decomment = require("decomment");
@@ -92,7 +94,9 @@ module.exports = function factory({
     // Adds autoprefixing to the compiled sass
     .pipe(
       postcss([
-        postcssCustomProperties(),
+        // postcssCustomProperties(),
+        postcssCSSVariables({ preserve: true }),
+        postcssCalc(),
         autoprefixer({
           grid: "autoplace"
         })
