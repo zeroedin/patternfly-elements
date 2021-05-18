@@ -63,7 +63,11 @@ The bare minimum skeleton HTML is:
 
 > Unfortunately we need to make sure all of the id's and classes are correct on this level for fall back styling, functionality may break if classes or id's are missing or incorrect.
 
-> `role=banner` should be added if the navigation is not inside of a `header` element or an element with `role=banner`. It indicates that the `pfe-navigation` tag is the site's header tag.
+### Role: Banner
+
+> [`role=banner`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Banner_Role) lets screen readers know that the content contained within the area that has that role is beginning page content. This beginning content is most often the site logo, company name, search, and main site navigtion. Either the `pfe-navigation` tag needs to be contained inside of the [`header` landmark tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/header) or it needs to be on the `pfe-navigation` tag itself if the `header` tag does not exist on the page. The `role=banner` attribute should only exist on the page in one location.
+> `role=banner` should be used on the page if the `header` is absent but it is always best to use landmark tags such as `header` rather than roles wherever possible.
+> When `role=banner` is added to the `pfe-navigation` tag it indicates that the `pfe-navigation` tag is the site's header tag.
 
 ### Logo variations
 
