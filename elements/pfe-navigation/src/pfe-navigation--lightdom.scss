@@ -522,23 +522,26 @@ pfe-navigation {
 }
 
 .skip-link[class][class] { // Adding specificity to beat out site styles
-  font-size: 14px;
-  line-height: 18px;
+  font-size: 20px;
+  line-height: 22px;
+  text-decoration: underline !important;
 
   &:focus {
     position: fixed;
-    top: 8px;
-    left: 50%;
+    top: 0px;
+    left: 0%;
     z-index: 99999;
     width: auto;
     height: auto;
     padding: (6 / 14 * 1em) (8 / 14 * 1em);
-    border-radius: (3 / 14 * 1em);
-    transform: translateX(-50%);
+    border-radius: 0;
+    transform: translateX(0%);
     clip: auto;
     background: pfe-local(BackgroundColor, $region: skip-link);
     color: pfe-local(Color, $region: skip-link);
     text-decoration: none;
+    border: 2px dashed #000;
+    outline: 0;
   }
 }
 
