@@ -66,8 +66,110 @@ The bare minimum skeleton HTML is:
 ### Role: Banner
 
 > [`role=banner`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Banner_Role) lets screen readers know that the content contained within the area that has that role is beginning page content. This beginning content is most often the site logo, company name, search, and main site navigtion. Either the `pfe-navigation` tag needs to be contained inside of the [`header` landmark tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/header) or it needs to be on the `pfe-navigation` tag itself if the `header` tag does not exist on the page. The `role=banner` attribute should only exist on the page in one location.
+
 > `role=banner` should be used on the page if the `header` is absent but it is always best to use landmark tags such as `header` rather than roles wherever possible.
+
 > When `role=banner` is added to the `pfe-navigation` tag it indicates that the `pfe-navigation` tag is the site's header tag.
+
+#### PFE-NAVIGATION set as the `header` tag using `role=banner`
+
+```html
+<!-- These links should be directly after <body> -->
+<a href="#pfe-navigation" class="visually-hidden skip-link">Skip to navigation</a>
+<!-- !! Update anchor link to main/content -->
+<a href="#ADD-ID-TO-MAIN" class="visually-hidden skip-link">Skip to content</a>
+
+<pfe-navigation id="pfe-navigation" role="banner">
+  <nav class="pfe-navigation" aria-label="Main Navigation">
+    <div class="pfe-navigation__logo-wrapper" id="pfe-navigation__logo-wrapper">
+      <a href="/" class="pfe-navigation__logo-link">
+        <!-- !! Update logo src -->
+        <img
+          class="pfe-navigation__logo-image pfe-navigation__logo-image--print"
+          src="assets/redhat--reverse.svg" width="400" alt="Redhat"
+        />
+      </a>
+    </div>
+    <ul class="pfe-navigation__menu" id="pfe-navigation__menu">
+      <li class="pfe-navigation__menu-item">
+        <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+          Menu Link 1
+        </a>
+      </li>
+
+      <li class="pfe-navigation__menu-item">
+        <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+          Menu Link 2
+        </a>
+      </li>
+
+      <li class="pfe-navigation__menu-item">
+        <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+          Menu Link 3
+        </a>
+      </li>
+
+      <li class="pfe-navigation__menu-item">
+        <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+          Menu Link 4
+        </a>
+      </li>
+    </ul>
+
+  </nav>
+</pfe-navigation>
+```
+
+#### PFE-NAVIGATION contained within the `header` landmark tag
+
+```html
+<header>
+  <!-- These links should be directly after <body> -->
+  <a href="#pfe-navigation" class="visually-hidden skip-link">Skip to navigation</a>
+  <!-- !! Update anchor link to main/content -->
+  <a href="#ADD-ID-TO-MAIN" class="visually-hidden skip-link">Skip to content</a>
+
+  <pfe-navigation id="pfe-navigation">
+    <nav class="pfe-navigation" aria-label="Main Navigation">
+      <div class="pfe-navigation__logo-wrapper" id="pfe-navigation__logo-wrapper">
+        <a href="/" class="pfe-navigation__logo-link">
+          <!-- !! Update logo src -->
+          <img
+            class="pfe-navigation__logo-image pfe-navigation__logo-image--print"
+            src="assets/redhat--reverse.svg" width="400" alt="Redhat"
+          />
+        </a>
+      </div>
+      <ul class="pfe-navigation__menu" id="pfe-navigation__menu">
+        <li class="pfe-navigation__menu-item">
+          <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+            Menu Link 1
+          </a>
+        </li>
+
+        <li class="pfe-navigation__menu-item">
+          <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+            Menu Link 2
+          </a>
+        </li>
+
+        <li class="pfe-navigation__menu-item">
+          <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+            Menu Link 3
+          </a>
+        </li>
+
+        <li class="pfe-navigation__menu-item">
+          <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+            Menu Link 4
+          </a>
+        </li>
+      </ul>
+
+    </nav>
+  </pfe-navigation>
+</header>
+```
 
 ### Logo variations
 
