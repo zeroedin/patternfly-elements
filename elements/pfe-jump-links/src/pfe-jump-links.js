@@ -497,13 +497,14 @@ class PfeJumpLinksPanel extends PFElement {
     }
 
     // Make an array from the node list
-    const sectionArr = [...sections];
+    var sectionArr = [].concat(toConsumableArray(sections));
     // Get all the sections that match this point in the scroll
-    const matches = sectionArr
-      .filter(section => window.scrollY >= section.offsetTop - this.offsetValue)
-      .reverse();
+    var matches = sectionArr.filter(function(section) {
+      var viewportOffset = section.getBoundingClientRect();
+      return viewportOffset.top >= 0;
+    });
 
-    //Identify the last one queried as the current section
+    // Identify the last one queried as the current section
     const current = sectionArr.indexOf(matches[0]);
 
     // If that section isn't already active,

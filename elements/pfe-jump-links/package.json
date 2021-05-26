@@ -11,7 +11,7 @@
     },
     "assets": []
   },
-  "version": "1.0.0-prerelease.59",
+  "version": "1.0.0-prerelease.60",
   "keywords": [
     "web-components",
     "html"
@@ -39,14 +39,18 @@
   "contributors": [
     {
       "name": "Daniel Faucette"
+    },
+    {
+      "name": "castastrophe",
+      "url": "https://www.github.com/castastrophe"
     }
   ],
   "license": "MIT",
   "dependencies": {
-    "@patternfly/pfe-accordion": "1.3.0",
-    "@patternfly/pfelement": "1.3.0"
+    "@patternfly/pfe-accordion": "1.9.0",
+    "@patternfly/pfelement": "1.9.0"
   },
   "devDependencies": {
-    "@patternfly/pfe-sass": "1.3.0"
+    "@patternfly/pfe-sass": "1.9.0"
   }
 }
