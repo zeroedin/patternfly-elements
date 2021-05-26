@@ -619,7 +619,7 @@
         }
 
         // Make an array from the node list
-        var sectionArr = [].concat(toConsumableArray(sections));
+        var sectionArr = [].concat(toConsumableArray$1(sections));
         // Get all the sections that match this point in the scroll
         var matches = sectionArr.filter(function (section) {
           var viewportOffset = section.getBoundingClientRect();
