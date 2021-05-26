@@ -138,8 +138,8 @@ class PfeJumpLinksNav extends PFElement {
     this._observer = new MutationObserver(this._mutationCallback);
     this._reportHeight = this._reportHeight.bind(this);
     this.panel =
-      document.querySelector(`[pfe-c-scrolltarget=${this.id}]`) ||
-      document.querySelector(`[scrolltarget=${this.id}]`);
+      document.querySelector(`[scrolltarget=${this.id}]`) ||
+      document.querySelector(`[pfe-c-scrolltarget=${this.id}]`);
 
     window.addEventListener("resize", () => {});
   }
@@ -156,13 +156,12 @@ class PfeJumpLinksNav extends PFElement {
         menu.classList.add("pfe-jump-links-nav");
         this._menuContainer.innerHTML = menu.outerHTML;
 
-        let div = document.createElement("div");
+        if (this.hasAttribute("sr-text")) {
+          let div = document.createElement("div");
+          div.innerHTML = `<h2 class="sr-only" hidden>${this.getAttribute(
+            "sr-text"
+          )}</h2>`;
 
-        div.innerHTML = `<h2 class="sr-only" hidden>${this.getAttribute(
-          "sr-text"
-        )}</h2>`;
-
-        if (this.getAttribute("sr-text")) {
           this.shadowRoot.querySelector("nav").prepend(div);
         }
 
@@ -174,8 +173,8 @@ class PfeJumpLinksNav extends PFElement {
         }
         if (
           !(
-            this.hasAttribute("pfe-c-horizontal") ||
-            this.hasAttribute("horizontal")
+            this.hasAttribute("horizontal") ||
+            this.hasAttribute("pfe-c-horizontal")
           ) &&
           html !== ""
         ) {
@@ -200,8 +199,8 @@ class PfeJumpLinksNav extends PFElement {
     this._observer.observe(this, pfeJumpLinksNavObserverConfig);
 
     this.panel =
-      document.querySelector(`[pfe-c-scrolltarget="${this.id}"]`) ||
-      document.querySelector(`[scrolltarget="${this.id}"]`);
+      document.querySelector(`[scrolltarget="${this.id}"]`) ||
+      document.querySelector(`[pfe-c-scrolltarget="${this.id}"]`);
 
     this.panel.addEventListener(
       PfeJumpLinksPanel.events.change,
@@ -215,7 +214,6 @@ class PfeJumpLinksNav extends PFElement {
       PfeJumpLinksPanel.events.change,
       this._buildNav
     );
-    this.removeEventListener("click");
   }
 
   _rebuildNav() {
@@ -227,9 +225,10 @@ class PfeJumpLinksNav extends PFElement {
       let linkList = ``;
       if (!this.panel) {
         this.panel =
-          document.querySelector(`[pfe-c-scrolltarget="${this.id}"]`) ||
-          document.querySelector(`[scrolltarget="${this.id}"]`);
+          document.querySelector(`[scrolltarget="${this.id}"]`) ||
+          document.querySelector(`[pfe-c-scrolltarget="${this.id}"]`);
       }
+
       let panelSections = this.panel.querySelectorAll(
         ".pfe-jump-links-panel__section"
       );
@@ -238,10 +237,12 @@ class PfeJumpLinksNav extends PFElement {
         let arr = [...panelSections];
         let section = arr[i];
         let text = section.innerHTML;
+
         // If a custom label was provided, use that instead
         if (section.hasAttribute("nav-label")) {
           text = section.getAttribute("nav-label");
         }
+
         if (section.classList.contains("has-sub-section")) {
           let linkListItem = `
           <li class="pfe-jump-links-nav__item">
@@ -399,11 +400,11 @@ class PfeJumpLinksPanel extends PFElement {
     this._init = this._init.bind(this);
     this._slot = this.shadowRoot.querySelector("slot");
     this._slot.addEventListener("slotchange", this._init);
+    this.debounce = this.debounce.bind(this);
     this._scrollCallback = this._scrollCallback.bind(this);
     this._mutationCallback = this._mutationCallback.bind(this);
     this._handleResize = this._handleResize.bind(this);
     this._observer = new MutationObserver(this._mutationCallback);
-    this.currentActive = null;
     this.currentActive = 0;
     this.current = -1;
     window.addEventListener("resize", this._handleResize);
@@ -431,6 +432,8 @@ class PfeJumpLinksPanel extends PFElement {
       this.nav._rebuildNav();
     }
 
+    this._makeActive(this.currentActive);
+
     this._observer.observe(this, pfeJumpLinksPanelObserverConfig);
   }
 
@@ -453,7 +456,7 @@ class PfeJumpLinksPanel extends PFElement {
   }
 
   _init() {
-    window.addEventListener("scroll", this.debounce(this._scrollCallback, 100));
+    window.addEventListener("scroll", this.debounce("_scrollCallback", 100));
     this.JumpLinksNav = document.querySelector(`#${this.scrollTarget}`);
     this.sections = this.querySelectorAll(".pfe-jump-links-panel__section");
 
@@ -557,9 +560,9 @@ class PfeJumpLinksPanel extends PFElement {
   }
 
   debounce(method, delay) {
-    clearTimeout(method._tId);
-    method._tId= setTimeout(() => {
-        method();
+    clearTimeout(this[method]._tId);
+    this[method]._tId = setTimeout(() => {
+      this[method]();
     }, delay);
   }
 
@@ -572,7 +575,7 @@ class PfeJumpLinksPanel extends PFElement {
     } else {
       sections = this.sections;
     }
-    
+
     //Check list of links to make sure we have them (if not, get them)
     if (this.menu_links.length < 1 || !this.menu_links) {
       this.menu_links = this.JumpLinksNav.shadowRoot.querySelectorAll("a");
@@ -583,12 +586,14 @@ class PfeJumpLinksPanel extends PFElement {
     const sectionArr = [...sections];
 
     // Get all the sections that match this point in the scroll
-    const matches = sectionArr.filter(
-      section => {
-        return section.getBoundingClientRect().top > this.offsetValue &&
-          section.getBoundingClientRect().bottom < window.innerHeight;
-      }
-    );
+    const matches = sectionArr.filter(section => {
+      return (
+        section.getBoundingClientRect().top > this.offsetValue &&
+        section.getBoundingClientRect().bottom < window.innerHeight
+      );
+    });
+
+    console.log(matches);
 
     // Don't change anything if no items were found
     if (matches.length === 0) return;
@@ -599,18 +604,27 @@ class PfeJumpLinksPanel extends PFElement {
     // If there is more than 1 match, check it's distance from the top
     // whichever is within 200px, that is our current.
     if (matches.length > 1) {
-      const close = matches.filter(section => section.getBoundingClientRect().top >= 200);
-      current = close[close.length - 1];
+      const close = matches.filter(
+        section => section.getBoundingClientRect().top <= 200
+      );
+      // If 1 or more items are found, use the last one.
+      if (close.length > 0) current = close[close.length - 1];
     }
 
-    const currentIdx = sectionArr.indexOf(current);
+    console.log(current);
 
-    // If that section isn't already active,
-    // remove active from the other links and make it active
-    if (currentIdx !== this.currentActive) {
-      this._removeAllActive();
-      this.currentActive = currentIdx;
-      this._makeActive(currentIdx);
+    if (current) {
+      const currentIdx = sectionArr.indexOf(current);
+
+      console.log({currentIdx, currentActive: this.currentActive});
+
+      // If that section isn't already active,
+      // remove active from the other links and make it active
+      if (currentIdx !== this.currentActive) {
+        this._removeAllActive();
+        this.currentActive = currentIdx;
+        this._makeActive(currentIdx);
+      }
     }
   }
 }

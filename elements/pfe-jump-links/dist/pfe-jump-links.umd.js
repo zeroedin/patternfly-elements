@@ -234,7 +234,7 @@
       _this2._menuContainer = _this2.shadowRoot.querySelector("#container");
       _this2._observer = new MutationObserver(_this2._mutationCallback);
       _this2._reportHeight = _this2._reportHeight.bind(_this2);
-      _this2.panel = document.querySelector("[pfe-c-scrolltarget=" + _this2.id + "]") || document.querySelector("[scrolltarget=" + _this2.id + "]");
+      _this2.panel = document.querySelector("[scrolltarget=" + _this2.id + "]") || document.querySelector("[pfe-c-scrolltarget=" + _this2.id + "]");
 
       window.addEventListener("resize", function () {});
       return _this2;
@@ -254,11 +254,10 @@
             menu.classList.add("pfe-jump-links-nav");
             this._menuContainer.innerHTML = menu.outerHTML;
 
-            var div = document.createElement("div");
+            if (this.hasAttribute("sr-text")) {
+              var div = document.createElement("div");
+              div.innerHTML = "<h2 class=\"sr-only\" hidden>" + this.getAttribute("sr-text") + "</h2>";
 
-            div.innerHTML = "<h2 class=\"sr-only\" hidden>" + this.getAttribute("sr-text") + "</h2>";
-
-            if (this.getAttribute("sr-text")) {
               this.shadowRoot.querySelector("nav").prepend(div);
             }
 
@@ -266,7 +265,7 @@
             if (this.querySelector("[slot='pfe-jump-links-nav--heading']")) {
               html = this.querySelector("[slot='pfe-jump-links-nav--heading']").cloneNode(true);
             }
-            if (!(this.hasAttribute("pfe-c-horizontal") || this.hasAttribute("horizontal")) && html !== "") {
+            if (!(this.hasAttribute("horizontal") || this.hasAttribute("pfe-c-horizontal")) && html !== "") {
               this.shadowRoot.querySelector("pfe-accordion-header").appendChild(html);
             } else {
               var heading = document.createElement("h3");
@@ -281,7 +280,7 @@
 
         this._observer.observe(this, pfeJumpLinksNavObserverConfig);
 
-        this.panel = document.querySelector("[pfe-c-scrolltarget=\"" + this.id + "\"]") || document.querySelector("[scrolltarget=\"" + this.id + "\"]");
+        this.panel = document.querySelector("[scrolltarget=\"" + this.id + "\"]") || document.querySelector("[pfe-c-scrolltarget=\"" + this.id + "\"]");
 
         this.panel.addEventListener(PfeJumpLinksPanel.events.change, this._buildNav);
       }
@@ -290,7 +289,6 @@
       value: function disconnectedCallback() {
         this._observer.disconnect();
         this.panel.removeEventListener(PfeJumpLinksPanel.events.change, this._buildNav);
-        this.removeEventListener("click");
       }
     }, {
       key: "_rebuildNav",
@@ -305,18 +303,21 @@
         var buildLinkList = function buildLinkList() {
           var linkList = "";
           if (!_this3.panel) {
-            _this3.panel = document.querySelector("[pfe-c-scrolltarget=\"" + _this3.id + "\"]") || document.querySelector("[scrolltarget=\"" + _this3.id + "\"]");
+            _this3.panel = document.querySelector("[scrolltarget=\"" + _this3.id + "\"]") || document.querySelector("[pfe-c-scrolltarget=\"" + _this3.id + "\"]");
           }
+
           var panelSections = _this3.panel.querySelectorAll(".pfe-jump-links-panel__section");
 
           for (var i = 0; i < panelSections.length; i++) {
             var arr = [].concat(toConsumableArray(panelSections));
             var section = arr[i];
             var text = section.innerHTML;
+
             // If a custom label was provided, use that instead
             if (section.hasAttribute("nav-label")) {
               text = section.getAttribute("nav-label");
             }
+
             if (section.classList.contains("has-sub-section")) {
               var linkListItem = "\n          <li class=\"pfe-jump-links-nav__item\">\n            <a\n              class=\"pfe-jump-links-nav__link has-sub-section\"\n              href=\"#" + section.id + "\"\n              data-target=\"" + section.id + "\">\n                " + text + "\n            </a>\n            <ul class=\"sub-nav\">\n        ";
               linkList += linkListItem;
@@ -449,11 +450,11 @@
       _this4._init = _this4._init.bind(_this4);
       _this4._slot = _this4.shadowRoot.querySelector("slot");
       _this4._slot.addEventListener("slotchange", _this4._init);
+      _this4.debounce = _this4.debounce.bind(_this4);
       _this4._scrollCallback = _this4._scrollCallback.bind(_this4);
       _this4._mutationCallback = _this4._mutationCallback.bind(_this4);
       _this4._handleResize = _this4._handleResize.bind(_this4);
       _this4._observer = new MutationObserver(_this4._mutationCallback);
-      _this4.currentActive = null;
       _this4.currentActive = 0;
       _this4.current = -1;
       window.addEventListener("resize", _this4._handleResize);
@@ -476,6 +477,8 @@
         if (this.nav && (this.nav.hasAttribute("pfe-c-autobuild") || this.nav.hasAttribute("autobuild"))) {
           this.nav._rebuildNav();
         }
+
+        this._makeActive(this.currentActive);
 
         this._observer.observe(this, pfeJumpLinksPanelObserverConfig);
       }
@@ -502,7 +505,7 @@
     }, {
       key: "_init",
       value: function _init() {
-        window.addEventListener("scroll", this.debounce(this._scrollCallback, 100));
+        window.addEventListener("scroll", this.debounce("_scrollCallback", 100));
         this.JumpLinksNav = document.querySelector("#" + this.scrollTarget);
         this.sections = this.querySelectorAll(".pfe-jump-links-panel__section");
 
@@ -604,15 +607,17 @@
     }, {
       key: "debounce",
       value: function debounce(method, delay) {
-        clearTimeout(method._tId);
-        method._tId = setTimeout(function () {
-          method();
+        var _this6 = this;
+
+        clearTimeout(this[method]._tId);
+        this[method]._tId = setTimeout(function () {
+          _this6[method]();
         }, delay);
       }
     }, {
       key: "_scrollCallback",
       value: function _scrollCallback() {
-        var _this6 = this;
+        var _this7 = this;
 
         var sections = void 0;
         var menu_links = void 0;
@@ -634,8 +639,10 @@
 
         // Get all the sections that match this point in the scroll
         var matches = sectionArr.filter(function (section) {
-          return section.getBoundingClientRect().top > _this6.offsetValue && section.getBoundingClientRect().bottom < window.innerHeight;
+          return section.getBoundingClientRect().top > _this7.offsetValue && section.getBoundingClientRect().bottom < window.innerHeight;
         });
+
+        console.log(matches);
 
         // Don't change anything if no items were found
         if (matches.length === 0) return;
@@ -647,19 +654,26 @@
         // whichever is within 200px, that is our current.
         if (matches.length > 1) {
           var close = matches.filter(function (section) {
-            return section.getBoundingClientRect().top >= 200;
+            return section.getBoundingClientRect().top <= 200;
           });
-          current = close[close.length - 1];
+          // If 1 or more items are found, use the last one.
+          if (close.length > 0) current = close[close.length - 1];
         }
 
-        var currentIdx = sectionArr.indexOf(current);
+        console.log(current);
 
-        // If that section isn't already active,
-        // remove active from the other links and make it active
-        if (currentIdx !== this.currentActive) {
-          this._removeAllActive();
-          this.currentActive = currentIdx;
-          this._makeActive(currentIdx);
+        if (current) {
+          var currentIdx = sectionArr.indexOf(current);
+
+          console.log({ currentIdx: currentIdx, currentActive: this.currentActive });
+
+          // If that section isn't already active,
+          // remove active from the other links and make it active
+          if (currentIdx !== this.currentActive) {
+            this._removeAllActive();
+            this.currentActive = currentIdx;
+            this._makeActive(currentIdx);
+          }
         }
       }
     }]);
