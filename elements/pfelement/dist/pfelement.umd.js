@@ -100,7 +100,7 @@
   };
 
   /*!
-   * PatternFly Elements: PFElement 1.0.0-prerelease.55
+   * PatternFly Elements: PFElement 1.0.0-prerelease.56
    * @license
    * Copyright 2020 Red Hat, Inc.
    * 
