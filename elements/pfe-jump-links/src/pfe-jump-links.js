@@ -308,7 +308,7 @@ class PfeJumpLinksPanel extends PFElement {
   }
 
   get offsetValue() {
-    return this.sectionMargin || this.customVar;
+    return this.sectionMargin || this.customVar || 0;
   }
 
   static get PfeType() {
@@ -347,7 +347,7 @@ class PfeJumpLinksPanel extends PFElement {
 
     this.sectionMargin =
       this.getAttribute("pfe-c-offset") || this.getAttribute("offset");
-    this.customVar = this.cssVariable("--pfe-jump-links-panel--offset") || 200;
+    this.customVar = this.cssVariable("--pfe-jump-links-panel--offset");
     if (
       this.nav &&
       (this.nav.hasAttribute("pfe-c-autobuild") ||
@@ -378,7 +378,7 @@ class PfeJumpLinksPanel extends PFElement {
   }
 
   _init() {
-    window.addEventListener("scroll", this._scrollCallback);
+    window.addEventListener("scroll", this.debounce(this._scrollCallback, 100));
     this.JumpLinksNav = document.querySelector(`#${this.scrollTarget}`);
     this.sections = this.querySelectorAll(".pfe-jump-links-panel__section");
 
@@ -391,7 +391,7 @@ class PfeJumpLinksPanel extends PFElement {
     this.nav._reportHeight();
     this.sectionMargin =
       this.getAttribute("pfe-c-offset") || this.getAttribute("offset");
-    this.customVar = this.cssVariable("--pfe-jump-links-panel--offset") || 200;
+    this.customVar = this.cssVariable("--pfe-jump-links-panel--offset");
   }
 
   _getNav() {
@@ -481,6 +481,13 @@ class PfeJumpLinksPanel extends PFElement {
     }
   }
 
+  debounce(method, delay) {
+    clearTimeout(method._tId);
+    method._tId = setTimeout(() => {
+      method();
+    }, delay);
+  }
+
   _scrollCallback() {
     let sections;
     let menu_links;
@@ -490,6 +497,7 @@ class PfeJumpLinksPanel extends PFElement {
     } else {
       sections = this.sections;
     }
+
     //Check list of links to make sure we have them (if not, get them)
     if (this.menu_links.length < 1 || !this.menu_links) {
       this.menu_links = this.JumpLinksNav.shadowRoot.querySelectorAll("a");
@@ -500,19 +508,36 @@ class PfeJumpLinksPanel extends PFElement {
     const sectionArr = [...sections];
 
     // Get all the sections that match this point in the scroll
-    const matches = sectionArr.filter(
-      section => section.getBoundingClientRect().top >= 0
-    );
+    const matches = sectionArr.filter(section => {
+      return (
+        section.getBoundingClientRect().top > this.offsetValue &&
+        section.getBoundingClientRect().bottom < window.innerHeight
+      );
+    });
 
-    // Identify the last one queried as the current section
-    const current = sectionArr.indexOf(matches[0]);
+    // Don't change anything if no items were found
+    if (matches.length === 0) return;
+
+    // Identify the first one queried as the current section
+    let current = matches[0];
+
+    // If there is more than 1 match, check it's distance from the top
+    // whichever is within 200px, that is our current.
+    if (matches.length > 1) {
+      const close = matches.filter(
+        section => section.getBoundingClientRect().top >= 200
+      );
+      current = close[close.length - 1];
+    }
+
+    const currentIdx = sectionArr.indexOf(current);
 
     // If that section isn't already active,
     // remove active from the other links and make it active
-    if (current !== this.currentActive) {
+    if (currentIdx !== this.currentActive) {
       this._removeAllActive();
-      this.currentActive = current;
-      this._makeActive(current);
+      this.currentActive = currentIdx;
+      this._makeActive(currentIdx);
     }
   }
 }

@@ -409,7 +409,7 @@
     }, {
       key: "offsetValue",
       get: function get$$1() {
-        return this.sectionMargin || this.customVar;
+        return this.sectionMargin || this.customVar || 0;
       }
     }], [{
       key: "version",
@@ -472,7 +472,7 @@
         this._init();
 
         this.sectionMargin = this.getAttribute("pfe-c-offset") || this.getAttribute("offset");
-        this.customVar = this.cssVariable("--pfe-jump-links-panel--offset") || 200;
+        this.customVar = this.cssVariable("--pfe-jump-links-panel--offset");
         if (this.nav && (this.nav.hasAttribute("pfe-c-autobuild") || this.nav.hasAttribute("autobuild"))) {
           this.nav._rebuildNav();
         }
@@ -502,7 +502,7 @@
     }, {
       key: "_init",
       value: function _init() {
-        window.addEventListener("scroll", this._scrollCallback);
+        window.addEventListener("scroll", this.debounce(this._scrollCallback, 100));
         this.JumpLinksNav = document.querySelector("#" + this.scrollTarget);
         this.sections = this.querySelectorAll(".pfe-jump-links-panel__section");
 
@@ -515,7 +515,7 @@
       value: function _handleResize() {
         this.nav._reportHeight();
         this.sectionMargin = this.getAttribute("pfe-c-offset") || this.getAttribute("offset");
-        this.customVar = this.cssVariable("--pfe-jump-links-panel--offset") || 200;
+        this.customVar = this.cssVariable("--pfe-jump-links-panel--offset");
       }
     }, {
       key: "_getNav",
@@ -602,8 +602,18 @@
         }
       }
     }, {
+      key: "debounce",
+      value: function debounce(method, delay) {
+        clearTimeout(method._tId);
+        method._tId = setTimeout(function () {
+          method();
+        }, delay);
+      }
+    }, {
       key: "_scrollCallback",
       value: function _scrollCallback() {
+        var _this6 = this;
+
         var sections = void 0;
         var menu_links = void 0;
         //Check sections to make sure we have them (if not, get them)
@@ -612,6 +622,7 @@
         } else {
           sections = this.sections;
         }
+
         //Check list of links to make sure we have them (if not, get them)
         if (this.menu_links.length < 1 || !this.menu_links) {
           this.menu_links = this.JumpLinksNav.shadowRoot.querySelectorAll("a");
@@ -623,18 +634,32 @@
 
         // Get all the sections that match this point in the scroll
         var matches = sectionArr.filter(function (section) {
-          return section.getBoundingClientRect().top >= 0;
+          return section.getBoundingClientRect().top > _this6.offsetValue && section.getBoundingClientRect().bottom < window.innerHeight;
         });
 
-        // Identify the last one queried as the current section
-        var current = sectionArr.indexOf(matches[0]);
+        // Don't change anything if no items were found
+        if (matches.length === 0) return;
+
+        // Identify the first one queried as the current section
+        var current = matches[0];
+
+        // If there is more than 1 match, check it's distance from the top
+        // whichever is within 200px, that is our current.
+        if (matches.length > 1) {
+          var close = matches.filter(function (section) {
+            return section.getBoundingClientRect().top >= 200;
+          });
+          current = close[close.length - 1];
+        }
+
+        var currentIdx = sectionArr.indexOf(current);
 
         // If that section isn't already active,
         // remove active from the other links and make it active
-        if (current !== this.currentActive) {
+        if (currentIdx !== this.currentActive) {
           this._removeAllActive();
-          this.currentActive = current;
-          this._makeActive(current);
+          this.currentActive = currentIdx;
+          this._makeActive(currentIdx);
         }
       }
     }]);
