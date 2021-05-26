@@ -79,7 +79,7 @@
     return call && (typeof call === "object" || typeof call === "function") ? call : self;
   };
 
-  var toConsumableArray$1 = function (arr) {
+  var toConsumableArray = function (arr) {
     if (Array.isArray(arr)) {
       for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
 
@@ -310,7 +310,7 @@
           var panelSections = _this3.panel.querySelectorAll(".pfe-jump-links-panel__section");
 
           for (var i = 0; i < panelSections.length; i++) {
-            var arr = [].concat(toConsumableArray$1(panelSections));
+            var arr = [].concat(toConsumableArray(panelSections));
             var section = arr[i];
             var text = section.innerHTML;
             // If a custom label was provided, use that instead
@@ -575,7 +575,7 @@
           };
           Object.keys.forEach = Array.forEach;
         }
-        [].concat(toConsumableArray$1(Array(this.sections.length).keys())).forEach(function (link) {
+        [].concat(toConsumableArray(Array(this.sections.length).keys())).forEach(function (link) {
           _this5._removeActive(link);
         });
       }
@@ -619,11 +619,11 @@
         }
 
         // Make an array from the node list
-        var sectionArr = [].concat(toConsumableArray$1(sections));
+        var sectionArr = [].concat(toConsumableArray(sections));
+
         // Get all the sections that match this point in the scroll
         var matches = sectionArr.filter(function (section) {
-          var viewportOffset = section.getBoundingClientRect();
-          return viewportOffset.top >= 0;
+          return section.getBoundingClientRect().top >= 0;
         });
 
         // Identify the last one queried as the current section
