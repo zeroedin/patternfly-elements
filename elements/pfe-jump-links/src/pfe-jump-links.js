@@ -500,8 +500,8 @@ class PfeJumpLinksPanel extends PFElement {
     const sectionArr = [...sections];
 
     // Get all the sections that match this point in the scroll
-    var matches = sectionArr.filter(function(section) {
-      var viewportOffset = section.getBoundingClientRect();
+    const matches = sectionArr.filter(section => {
+      const viewportOffset = section.getBoundingClientRect();
       return viewportOffset.top >= 0;
     });
 
