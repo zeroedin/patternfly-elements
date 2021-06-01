@@ -381,7 +381,9 @@ class PfeJumpLinksPanel extends PFElement {
   }
 
   _init() {
-    window.addEventListener("scroll", this.debounce("_scrollCallback", 100));
+    window.addEventListener("scroll", () =>
+      this.debounce("_scrollCallback", 10)
+    );
     this.JumpLinksNav = document.querySelector(`#${this.scrollTarget}`);
     this.sections = this.querySelectorAll(".pfe-jump-links-panel__section");
 
@@ -493,7 +495,6 @@ class PfeJumpLinksPanel extends PFElement {
 
   _scrollCallback() {
     let sections;
-    let menu_links;
     //Check sections to make sure we have them (if not, get them)
     if (!this.sections || typeof this.sections === "undefined") {
       this.sections = this.querySelectorAll(".pfe-jump-links-panel__section");
@@ -501,24 +502,20 @@ class PfeJumpLinksPanel extends PFElement {
       sections = this.sections;
     }
 
-    //Check list of links to make sure we have them (if not, get them)
-    if (this.menu_links.length < 1 || !this.menu_links) {
-      this.menu_links = this.JumpLinksNav.shadowRoot.querySelectorAll("a");
-      menu_links = this.menu_links;
-    }
-
-    // Make an array from the node list
-    const sectionArr = [...sections];
-
     // Get all the sections that match this point in the scroll
-    const matches = sectionArr.filter(section => {
+    const matches = [...sections].filter((section, idx) => {
       return (
+        // If the top is below the offset point
         section.getBoundingClientRect().top > this.offsetValue &&
-        section.getBoundingClientRect().bottom < window.innerHeight
+        // If the bottom is above the viewport bottom
+        section.getBoundingClientRect().bottom < window.innerHeight &&
+        // Check that the heading is not more than 50% of the way down
+        // if the section in question is not the first one in the stack
+        window.innerHeight > 500 &&
+        (idx === 0 ||
+          section.getBoundingClientRect().bottom < window.innerHeight / 2)
       );
     });
-
-    console.log(matches);
 
     // Don't change anything if no items were found
     if (matches.length === 0) return;
@@ -526,8 +523,8 @@ class PfeJumpLinksPanel extends PFElement {
     // Identify the first one queried as the current section
     let current = matches[0];
 
-    // If there is more than 1 match, check it's distance from the top
-    // whichever is within 200px, that is our current.
+    // If there is more than 1 match, check it's distance from the top;
+    // whichever is within 200px, that is our new current.
     if (matches.length > 1) {
       const close = matches.filter(
         section => section.getBoundingClientRect().top <= 200
@@ -536,12 +533,8 @@ class PfeJumpLinksPanel extends PFElement {
       if (close.length > 0) current = close[close.length - 1];
     }
 
-    console.log(current);
-
     if (current) {
-      const currentIdx = sectionArr.indexOf(current);
-
-      console.log({ currentIdx, currentActive: this.currentActive });
+      const currentIdx = [...sections].indexOf(current);
 
       // If that section isn't already active,
       // remove active from the other links and make it active

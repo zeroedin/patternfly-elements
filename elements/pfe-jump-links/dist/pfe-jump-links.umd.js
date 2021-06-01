@@ -505,7 +505,11 @@
     }, {
       key: "_init",
       value: function _init() {
-        window.addEventListener("scroll", this.debounce("_scrollCallback", 100));
+        var _this5 = this;
+
+        window.addEventListener("scroll", function () {
+          return _this5.debounce("_scrollCallback", 10);
+        });
         this.JumpLinksNav = document.querySelector("#" + this.scrollTarget);
         this.sections = this.querySelectorAll(".pfe-jump-links-panel__section");
 
@@ -565,7 +569,7 @@
     }, {
       key: "_removeAllActive",
       value: function _removeAllActive() {
-        var _this5 = this;
+        var _this6 = this;
 
         if (!Object.keys) {
           Object.keys = function (obj) {
@@ -579,7 +583,7 @@
           Object.keys.forEach = Array.forEach;
         }
         [].concat(toConsumableArray(Array(this.sections.length).keys())).forEach(function (link) {
-          _this5._removeActive(link);
+          _this6._removeActive(link);
         });
       }
     }, {
@@ -607,20 +611,19 @@
     }, {
       key: "debounce",
       value: function debounce(method, delay) {
-        var _this6 = this;
+        var _this7 = this;
 
         clearTimeout(this[method]._tId);
         this[method]._tId = setTimeout(function () {
-          _this6[method]();
+          _this7[method]();
         }, delay);
       }
     }, {
       key: "_scrollCallback",
       value: function _scrollCallback() {
-        var _this7 = this;
+        var _this8 = this;
 
         var sections = void 0;
-        var menu_links = void 0;
         //Check sections to make sure we have them (if not, get them)
         if (!this.sections || typeof this.sections === "undefined") {
           this.sections = this.querySelectorAll(".pfe-jump-links-panel__section");
@@ -628,21 +631,18 @@
           sections = this.sections;
         }
 
-        //Check list of links to make sure we have them (if not, get them)
-        if (this.menu_links.length < 1 || !this.menu_links) {
-          this.menu_links = this.JumpLinksNav.shadowRoot.querySelectorAll("a");
-          menu_links = this.menu_links;
-        }
-
-        // Make an array from the node list
-        var sectionArr = [].concat(toConsumableArray(sections));
-
         // Get all the sections that match this point in the scroll
-        var matches = sectionArr.filter(function (section) {
-          return section.getBoundingClientRect().top > _this7.offsetValue && section.getBoundingClientRect().bottom < window.innerHeight;
+        var matches = [].concat(toConsumableArray(sections)).filter(function (section, idx) {
+          return (
+            // If the top is below the offset point
+            section.getBoundingClientRect().top > _this8.offsetValue &&
+            // If the bottom is above the viewport bottom
+            section.getBoundingClientRect().bottom < window.innerHeight &&
+            // Check that the heading is not more than 50% of the way down
+            // if the section in question is not the first one in the stack
+            window.innerHeight > 500 && (idx === 0 || section.getBoundingClientRect().bottom < window.innerHeight / 2)
+          );
         });
-
-        console.log(matches);
 
         // Don't change anything if no items were found
         if (matches.length === 0) return;
@@ -650,8 +650,8 @@
         // Identify the first one queried as the current section
         var current = matches[0];
 
-        // If there is more than 1 match, check it's distance from the top
-        // whichever is within 200px, that is our current.
+        // If there is more than 1 match, check it's distance from the top;
+        // whichever is within 200px, that is our new current.
         if (matches.length > 1) {
           var close = matches.filter(function (section) {
             return section.getBoundingClientRect().top <= 200;
@@ -660,12 +660,8 @@
           if (close.length > 0) current = close[close.length - 1];
         }
 
-        console.log(current);
-
         if (current) {
-          var currentIdx = sectionArr.indexOf(current);
-
-          console.log({ currentIdx: currentIdx, currentActive: this.currentActive });
+          var currentIdx = [].concat(toConsumableArray(sections)).indexOf(current);
 
           // If that section isn't already active,
           // remove active from the other links and make it active
