@@ -47,10 +47,10 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@patternfly/pfe-accordion": "1.9.0",
-    "@patternfly/pfelement": "1.9.0"
+    "@patternfly/pfe-accordion": "1.9.1",
+    "@patternfly/pfelement": "1.9.1"
   },
   "devDependencies": {
-    "@patternfly/pfe-sass": "1.9.0"
+    "@patternfly/pfe-sass": "1.9.1"
   }
 }

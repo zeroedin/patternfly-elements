@@ -616,7 +616,7 @@ class PfeJumpLinksPanel extends PFElement {
     if (current) {
       const currentIdx = sectionArr.indexOf(current);
 
-      console.log({currentIdx, currentActive: this.currentActive});
+      console.log({ currentIdx, currentActive: this.currentActive });
 
       // If that section isn't already active,
       // remove active from the other links and make it active
