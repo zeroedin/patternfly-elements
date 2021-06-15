@@ -20,8 +20,7 @@ See mixin blocks before selectors that contain the selector name and the three l
 
 [SELECTOR]--desktop: Neither are collapsed, typically used in:
   - @include breakpoint('nav-expand')
-
-  */
+*/
 
 * {
   &,
@@ -56,7 +55,7 @@ See mixin blocks before selectors that contain the selector name and the three l
 //   vertical-align: baseline;
 // }
 
-.pfe-navigation {
+nav.pfe-navigation { // Have to qualify class with tag because of crappy ShadyCSS & IE
   display: flex;
   align-items: stretch;
 }
@@ -192,8 +191,7 @@ See mixin blocks before selectors that contain the selector name and the three l
   }
 
   // Secondary link dropdown active behavior
-  [open-toggle='secondary-links__button--all-red-hat'] &,
-  [open-toggle^='pfe-navigation__custom-link--'] &,
+  [open-toggle^='pfe-navigation__secondary-link--'] &,
   [open-toggle='secondary-links__button--search'] & {
     @include pfe-navigation__menu-toggle--active();
     @include breakpoint('secondary-links-expand') {
@@ -338,9 +336,8 @@ See mixin blocks before selectors that contain the selector name and the three l
     display: flex;
   }
 
-  [open-toggle='secondary-links__button--all-red-hat'] &, // @todo site system or something more generic
   [open-toggle='secondary-links__button--search'] &,
-  [open-toggle^='pfe-navigation__custom-link--'] & {
+  [open-toggle^='pfe-navigation__secondary-link--'] & {
     display: flex;
     @include breakpoint('secondary-links-expand') {
       display: none;
@@ -494,7 +491,7 @@ See mixin blocks before selectors that contain the selector name and the three l
   width: 100%;
   max-height: 9999em;
   padding: 16px 24px;
-  font-size: 20px;
+  font-size: pfe-var(FontSize--xl);
   font-weight: 500;
   color: pfe-local(Color, $region: dropdown);
   background: transparent;
@@ -503,7 +500,7 @@ See mixin blocks before selectors that contain the selector name and the three l
   width: auto;
   max-height: 72px;
   padding: 0 8px;
-  font-size: 16px;
+  font-size: pfe-var(FontSize--md);
   font-weight: 400;
   color: pfe-local(Color--default, $region: nav-bar);
 }
@@ -597,7 +594,7 @@ See mixin blocks before selectors that contain the selector name and the three l
 @mixin pfe-navigation__dropdown-wrapper--mobile {
   position: static;
   // Desired padding plus negative margin on columns
-  padding: 0 #{24px + 16px};
+  padding: 0 calc(#{pfe-local('full-width--spacing--mobile', $region: 'dropdown')} + #{pfe-local('single-column--spacing', $region: 'dropdown')});
   background: transparent;
   transition: pfe-local(accordion-transition);
 }
@@ -606,7 +603,7 @@ See mixin blocks before selectors that contain the selector name and the three l
   top: 100%;
   left: 0;
   // Desired padding plus negative margin on columns
-  padding: 0 #{64px + 16px};
+  padding: 0 calc(#{pfe-local('full-width--spacing--desktop', $region: 'dropdown')} + #{pfe-local('full-width--spacing--mobile', $region: 'dropdown')});
   background: pfe-local(Background, $region: dropdown);
   transition: pfe-local(dropdown-transition);
 }
@@ -646,7 +643,7 @@ See mixin blocks before selectors that contain the selector name and the three l
 .pfe-navigation__dropdown {
   @include pfe-navigation__dropdown-content-styling;
   @include pfe-navigation__dropdown-layout--mobile;
-  font-size: 16px;
+  font-size: pfe-var(FontSize--md);
   color: pfe-local(Color, $region: dropdown);
   visibility: hidden;
   transition: visibility 0s linear 0.4s;
@@ -694,7 +691,7 @@ See mixin blocks before selectors that contain the selector name and the three l
     gap: 0;
   }
   @include breakpoint('nav-expand') {
-    padding: 16px 0;
+    padding: pfe-local('single-column--spacing', $region: 'dropdown') 0;
     background: pfe-local(Background, $region: dropdown);
   }
   @include collapse('nav') {
@@ -712,7 +709,7 @@ See mixin blocks before selectors that contain the selector name and the three l
   [role="heading"][aria-heading-level] {
     color: pfe-local(headings--single-column--Color, $region: dropdown);
     font-weight: 500;
-    font-size: 14px;
+    font-size: pfe-var(FontSize--sm);
   }
 }
 
@@ -721,13 +718,14 @@ See mixin blocks before selectors that contain the selector name and the three l
 .pfe-navigation__dropdown--single-column ul + ul,
 .pfe-navigation__sub-nav-link--separator[class] {
   border-top: pfe-local(separator--Border, $region: dropdown);
-  // -16px to overwrite the padding added to the .pfe-navigation__dropdown--single-column container div
-  margin-left: -16px;
-  margin-right: -16px;
-  margin-top: 16px;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 16px;
+  // Negative margin to counteract dropdown padding
+  $negative-margin: calc(#{pfe-local('single-column--spacing', $region: 'dropdown')} * -1);
+  margin-left: $negative-margin;
+  margin-right: $negative-margin;
+  margin-top: pfe-local('single-column--spacing', $region: 'dropdown');
+  padding-left: pfe-local('single-column--spacing', $region: 'dropdown');
+  padding-right: pfe-local('single-column--spacing', $region: 'dropdown');
+  padding-top: pfe-local('single-column--spacing', $region: 'dropdown');
 }
 
 // footer styles for mega menu trays
@@ -817,23 +815,25 @@ See mixin blocks before selectors that contain the selector name and the three l
   }
 }
 
-.pfe-navigation__search-dropdown-wrapper {
+// Out specifying default dropdown wrapper styles that have state classes and attributes in selectors
+.pfe-navigation__dropdown-wrapper--search[class][class] {
   position: absolute;
   top: 100%;
   left: 0;
   width: 100%;
-  display: none;
-  margin-bottom: 0;
+  height: auto;
   padding: 16px;
+  margin-bottom: 0;
   background: pfe-local(Background, $region: dropdown);
 
-  [open-toggle='secondary-links__button--search'][class] & { // Extra specificity to beat js breakpoints
-    display: block;
+  // Extra specificity to beat js breakpoints
+  &.pfe-navigation__dropdown-wrapper--invisible {
+    display: none;
   }
 }
 
 .pfe-navigation__search {
-  $mobile-margin-bottom: 24px;
+  $mobile-margin-bottom: pfe-local('full-width--spacing--mobile', $region: 'dropdown');
   display: block;
   width: 100%;
   margin-bottom: $mobile-margin-bottom;
@@ -854,33 +854,6 @@ See mixin blocks before selectors that contain the selector name and the three l
     visibility: hidden;
   }
 }
-
-//-- Custom styles applied by attributes
-// @each $option in () {
-//   :host([pfe-state="#{$option}"]) {
-//     // Add styles here
-//   }
-// }
-
-//-- Custom styles applied to slot
-// ::slotted([slot="pfe-navigation--search"]) {
-  // Add styles here
-// }
-
-// ::slotted([slot="pfe-navigation--custom-links"]) {
-  // Add styles here
-// }
-
-//-- Custom styles applied to slot's shadow element
-// .pfe-navigation {
-//   &__search {
-    // Add styles here
-//   }
-//   &__custom-links {
-    // Add styles here
-//   }
-// }
-
 
 // Secondary Links
 // --------------------------------------------------------
@@ -1006,7 +979,7 @@ See mixin blocks before selectors that contain the selector name and the three l
   @include top-level-button--in-top-bar;
 
   @media print {
-    display: none!important;
+    display: none;
   }
 
   // Competing with specificity of js breakpoint class
@@ -1014,17 +987,9 @@ See mixin blocks before selectors that contain the selector name and the three l
     @include top-level-button--in-top-bar;
   }
 }
+
 // @todo: (KS) add styles to hide account toggle and show the account link when logged-in class does NOT exist
 .pfe-navigation__account-wrapper {
-
-  // Hide account toggle if NOT logged in
-  // .pfe-navigation__account-toggle {
-  //   display: none;
-  // }
-  // // Show login link if NOT logged in
-  // .pfe-navigation__log-in-link {
-  //   display: flex;
-  // }
 
   .pfe-navigation__account-wrapper--logged-in {
     // Show account toggle if logged in
@@ -1048,6 +1013,7 @@ See mixin blocks before selectors that contain the selector name and the three l
 .pfe-navigation__account-toggle {
   height: pfe-local(Height, $region: 'nav-bar');
 
+  // Fighting specificity for these styles
   &[class][class][class] {
     display: flex;
     justify-content: center;
@@ -1071,24 +1037,22 @@ See mixin blocks before selectors that contain the selector name and the three l
   }
 }
 
-.pfe-navigation__dropdown-wrapper--account[class][class] {
-  position: absolute;
-  top: pfe-local(Height, $region: nav-bar);
-  left: 0;
-  width: 100%;
-  display: block;
-  height: 0;
-  padding: 0;
-  visibility: hidden;
-
-  &[aria-hidden='false'] {
-    visibility: visible;
+.pfe-navigation__dropdown-wrapper--account {
+  // Out specifying JS breakpoint selectors
+  &[class][class] {
+    position: absolute;
+    top: pfe-local(Height, $region: nav-bar);
+    left: 0;
+    width: 100%;
+    display: block;
+    padding: 0;
     height: auto;
+  }
+
+  &.pfe-navigation__dropdown-wrapper--invisible[class] {
+    display: none;
   }
 }
 
-
 // Should stay at the end of the file
-@import "sass-includes/pfe-navigation--grid";
-@import "sass-includes/pfe-navigation--site-switcher";
 @import "sass-includes/pfe-navigation--utility-classes";
