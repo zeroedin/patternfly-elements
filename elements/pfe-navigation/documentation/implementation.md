@@ -63,7 +63,63 @@ The bare minimum skeleton HTML is:
 
 > Unfortunately we need to make sure all of the id's and classes are correct on this level for fall back styling & behaviors. Functionality may break if classes or id's are missing or incorrect.
 
-> `role=banner` should be added if the navigation is not inside of a `header` element or an element with `role=banner`. It indicates that the `pfe-navigation` tag is the site's header tag.
+### Accessibility Considerations
+
+> There should only ever be one single `header` tag per page. This ensures that screen readers know which content is the main navigation of the site.
+> When `pfe-navigation` is inside of the `header` tag on the page the `role="banner"` will be removed by the component.
+> `pfe-navigation` should not be wrapped in a `div`, it will either be the `header` of the page itself when `role="banner"` is set on the `pfe-navigation` tag or it will be the `navigation` tag inside of the `header` tag.
+> The `role="banner"` attribute ensures that screen readers know which element is the page `header` when there is no `header` tag present on the page.
+
+#### PFE-NAVIGATION Inside Header Tag
+
+```html
+  <header>
+    <!-- These links should be directly after <body> or directly after <body> inside of the <header> when header tag is present -->
+    <a href="#pfe-navigation" class="visually-hidden skip-link">Skip to navigation</a>
+    <!-- !! Update anchor link to main/content -->
+    <a href="#ADD-ID-TO-MAIN" class="visually-hidden skip-link">Skip to content</a>
+
+    <pfe-navigation id="pfe-navigation">
+      <nav class="pfe-navigation" aria-label="Main Navigation">
+        <div class="pfe-navigation__logo-wrapper" id="pfe-navigation__logo-wrapper">
+          <a href="/" class="pfe-navigation__logo-link">
+            <!-- !! Update logo src -->
+            <img
+              class="pfe-navigation__logo-image pfe-navigation__logo-image--screen pfe-navigation__logo-image--print"
+              src="assets/redhat--reverse.svg" width="400" alt="Redhat"
+            />
+          </a>
+        </div>
+        <ul class="pfe-navigation__menu" id="pfe-navigation__menu">
+          <li class="pfe-navigation__menu-item">
+            <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+              Menu Link 1
+            </a>
+          </li>
+
+          <li class="pfe-navigation__menu-item">
+            <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+              Menu Link 2
+            </a>
+          </li>
+
+          <li class="pfe-navigation__menu-item">
+            <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+              Menu Link 3
+            </a>
+          </li>
+
+          <li class="pfe-navigation__menu-item">
+            <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
+              Menu Link 4
+            </a>
+          </li>
+        </ul>
+
+      </nav>
+    </pfe-navigation>
+  </header>
+```
 
 ### Logo variations
 
