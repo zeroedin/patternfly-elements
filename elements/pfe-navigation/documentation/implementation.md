@@ -65,61 +65,37 @@ The bare minimum skeleton HTML is:
 
 ### Accessibility Considerations
 
-> There should only ever be one single `header` tag per page. This ensures that screen readers know which content is the main navigation of the site.
-> When `pfe-navigation` is inside of the `header` tag on the page the `role="banner"` will be removed by the component.
-> `pfe-navigation` should not be wrapped in a `div`, it will either be the `header` of the page itself when `role="banner"` is set on the `pfe-navigation` tag or it will be the `navigation` tag inside of the `header` tag.
-> The `role="banner"` attribute ensures that screen readers know which element is the page `header` when there is no `header` tag present on the page.
+- There should only ever be one single `header` tag per page with the `role="banner"` attribute on it. This ensures that screen readers know which section is the main `header` and navigation of the site. Whenever the `header` tag is being used within any other context, such as a descendant of the `article` tag or a descendent of a `div` that has the `role="article"` then the tag should not have any `role` applied to it. See [header tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/header) and [W3 HTML Aria - header](https://www.w3.org/TR/html-aria/#dfn-no-corresponding-role) for more information.
+
+#### PFE-NAVIGATION Tag set as the Header of the page
+
+```html
+<pfe-navigation id="pfe-navigation" role="banner">
+  <!-- Menu markup -->
+</pfe-navigation>
+```
 
 #### PFE-NAVIGATION Inside Header Tag
 
 ```html
-  <header>
-    <!-- These links should be directly after <body> or directly after <body> inside of the <header> when header tag is present -->
-    <a href="#pfe-navigation" class="visually-hidden skip-link">Skip to navigation</a>
-    <!-- !! Update anchor link to main/content -->
-    <a href="#ADD-ID-TO-MAIN" class="visually-hidden skip-link">Skip to content</a>
-
-    <pfe-navigation id="pfe-navigation">
-      <nav class="pfe-navigation" aria-label="Main Navigation">
-        <div class="pfe-navigation__logo-wrapper" id="pfe-navigation__logo-wrapper">
-          <a href="/" class="pfe-navigation__logo-link">
-            <!-- !! Update logo src -->
-            <img
-              class="pfe-navigation__logo-image pfe-navigation__logo-image--screen pfe-navigation__logo-image--print"
-              src="assets/redhat--reverse.svg" width="400" alt="Redhat"
-            />
-          </a>
-        </div>
-        <ul class="pfe-navigation__menu" id="pfe-navigation__menu">
-          <li class="pfe-navigation__menu-item">
-            <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
-              Menu Link 1
-            </a>
-          </li>
-
-          <li class="pfe-navigation__menu-item">
-            <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
-              Menu Link 2
-            </a>
-          </li>
-
-          <li class="pfe-navigation__menu-item">
-            <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
-              Menu Link 3
-            </a>
-          </li>
-
-          <li class="pfe-navigation__menu-item">
-            <a href="#LINK-TO-CONTENT" class="pfe-navigation__menu-link">
-              Menu Link 4
-            </a>
-          </li>
-        </ul>
-
-      </nav>
-    </pfe-navigation>
-  </header>
+<header>
+  <!-- Other things that belong in header, e.g. supporting navigation, introductory content to the site, or other navigational aids -->
+  <pfe-navigation id="pfe-navigation">
+    <!-- Menu markup -->
+  </pfe-navigation>
+  <!-- Other things that belong in header -->
+</header>
 ```
+
+- `<header>` and a tag with `role="banner"` achieve the same thing when the `header` element is not a descendant of other containing elements. They tell the screen reader which section is the top main navigation and content area of the page.
+
+- When `pfe-navigation` is inside of the `header` tag on the page the `role="banner"` will be removed by the component.
+
+- `pfe-navigation` should not be wrapped in a any containing element suchs as a `div`, with the `role="banner"` - `<div role="banner">`, it will either be the `header` of the page itself when `role="banner"` is set on the `pfe-navigation` tag or it will be the `navigation` tag inside of the `header` tag.
+
+- The `role="banner"` attribute ensures that screen readers know which element is the page `header` when there is no `header` tag present on the page.
+
+- The recommended most accessible implementation for `pfe-navigation` is to always place it inside of the `header` tag whenever possible with the `role="banner"` removed from the `pfe-navigation` tag (which is removed by the component itself in this use case).
 
 ### Logo variations
 
