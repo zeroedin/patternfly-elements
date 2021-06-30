@@ -51,7 +51,8 @@
     "pree2e": "npm run clean:e2e",
     "e2e": "wdio wdio.conf.js",
     "todos": "leasot -x --reporter json 'elements/*/src/*.js' > docs/_data/todos.json",
-    "polyfills": "leasot -x --reporter json --tags 'POLYFILL' 'elements/*/src/*.js' | ./node_modules/node-jq/bin/jq 'map(select(.tag == \"POLYFILL\"))' > docs/_data/polyfills.json"
+    "polyfills": "leasot -x --reporter json --tags 'POLYFILL' 'elements/*/src/*.js' | ./node_modules/node-jq/bin/jq 'map(select(.tag == \"POLYFILL\"))' > docs/_data/polyfills.json",
+    "dev-new": "concurrently \"lerna run --parallel --no-bail watch\" \"browser-sync start --config bs-config.js\""
   },
   "husky": {
     "hooks": {
@@ -64,6 +65,7 @@
     "@babel/core": "^7.8.3",
     "@esm-bundle/chai": "^4.3.4",
     "@open-wc/testing": "^2.5.32",
+    "@patternfly/patternfly": "^4.115.2",
     "@polymer/iron-test-helpers": "^3.0.1",
     "@storybook/addon-actions": "^6.1.15",
     "@storybook/addon-backgrounds": "^5.3.8",
@@ -97,6 +99,7 @@
     "chromedriver": "^90.0.1",
     "clean-html": "^1.5.0",
     "compression": "^1.7.4",
+    "concurrently": "^6.2.0",
     "css-scss": "^0.1.1",
     "decomment": "^0.9.1",
     "del": "^6.0.0",
@@ -109,6 +112,7 @@
     "gulp": "^4.0.2",
     "gulp-banner": "^0.1.3",
     "gulp-clean-css": "^4.2.0",
+    "gulp-esbuild": "^0.8.2",
     "gulp-if": "^3.0.0",
     "gulp-jsdoc3": "^3.0.0",
     "gulp-match": "^1.1.0",

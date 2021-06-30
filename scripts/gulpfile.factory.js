@@ -47,6 +47,9 @@ module.exports = function factory({
   // Rollup
   const shell = require("gulp-shell");
 
+  // esbuild
+  const { createGulpEsbuild } = require("gulp-esbuild");
+
   // JavaScript
   const banner = require("gulp-banner");
   const rename = require("gulp-rename");
@@ -63,6 +66,23 @@ module.exports = function factory({
 
   // Markup
   const decomment = require("decomment");
+
+  const esbuildOptions = {
+    format: "esm",
+    target: "es2020",
+    logLevel: "info",
+    splitting: true,
+    bundle: true,
+    treeShaking: true,
+    metafile: true,
+    metafileName: "module-tree.json",
+    minify: false,
+    sourcemap: true,
+    legalComments: "linked",
+    external: []
+  };
+
+  const gulpEsbuild = createGulpEsbuild()(esbuildOptions);  
 
   // Delete the temp directory
   task("clean", () => del([paths.temp, paths.compiled], {
@@ -307,6 +327,11 @@ ${fs
   });
 
   task("bundle", shell.task("../../node_modules/.bin/rollup -c"));
+  // task("bundle", () => {
+  //   return src(`${paths.source}/${elementName}.js`)
+  //     .pipe(gulpEsbuild)
+  //     .pipe(dest(paths.compiled));
+  // });
 
   // Delete the temp directory
   task("clean:post", () => del(["*.min.css", "*.umd.js"], {
