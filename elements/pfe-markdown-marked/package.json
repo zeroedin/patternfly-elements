@@ -1,12 +1,9 @@
 {
-  "name": "@patternfly/pfe-markdown",
+  "name": "@patternfly/pfe-markdown-marked",
   "pfelement": {
     "className": "PfeMarkdown",
     "elementName": "pfe-markdown",
-    "preview": "markdown--screenshot.png",
-    "assets": [
-      "markdown_bg.wasm"
-    ]
+    "preview": "markdown--screenshot.png"
   },
   "version": "1.9.2",
   "description": "Markdown element for PatternFly Elements",

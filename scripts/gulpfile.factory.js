@@ -1,6 +1,6 @@
 module.exports = function factory({
   version,
-  pfelement: { elementName, className, assets = [] },
+  pfelement: {elementName, className, assets = []},
   prebundle = [],
   postbundle = []
 } = {}) {
@@ -31,9 +31,11 @@ module.exports = function factory({
     `${elementName}*.map`,
     `${elementName}.json`
   ]);
+  console.log(1, {files});
 
   // Dedupe any items
   files = files.filter((item, index) => files.indexOf(item) === index);
+  console.log(2, {files});
 
   // Tooling
   const _ = require("lodash");
@@ -66,16 +68,16 @@ module.exports = function factory({
 
   // Delete the temp directory
   task("clean", () => del([paths.temp, paths.compiled], {
-      cwd: paths.root,
-      read: false,
-      allowEmpty: true
-    })
+    cwd: paths.root,
+    read: false,
+    allowEmpty: true
+  })
   );
 
   // Compile the sass into css, compress, autoprefix
   task("compile:styles", () => src(`${paths.source}/*.{scss,css}`, {
-      base: paths.source
-    })
+    base: paths.source
+  })
     .pipe(sourcemaps.init())
     // Compile the Sass into CSS
     .pipe(
@@ -84,10 +86,10 @@ module.exports = function factory({
         // Pointing to the global node modules path
         includePaths: ["../../node_modules"]
       })
-      .on("error", gulpif(!process.env.CI, sass.logError, (err) => {
-        sass.logError;
-        process.exit(1);
-      }))
+        .on("error", gulpif(!process.env.CI, sass.logError, (err) => {
+          sass.logError;
+          process.exit(1);
+        }))
     )
     // Adds autoprefixing to the compiled sass
     .pipe(
@@ -110,8 +112,8 @@ module.exports = function factory({
 
   // Compile the sass into css, compress, autoprefix
   task("minify:styles", () => src(`${paths.temp}/*.{scss,css}`, {
-      base: paths.temp
-    })
+    base: paths.temp
+  })
     .pipe(sourcemaps.init())
     // Minify the file
     .pipe(
@@ -145,9 +147,9 @@ module.exports = function factory({
       // Returns a string with the cleaned up HTML
       return decomment(
         fs
-        .readFileSync(path.join(paths.source, url))
-        .toString()
-        .trim()
+          .readFileSync(path.join(paths.source, url))
+          .toString()
+          .trim()
       );
     }
     return null;
@@ -271,13 +273,13 @@ module.exports = function factory({
  * PatternFly Elements: ${className} ${version}
  * @license
 ${fs
-  .readFileSync("LICENSE.txt", "utf8")
-  .split("\n")
-  .map(line => ` * ${line}\n`)
-  .join("")}*/\n\n`
+              .readFileSync("LICENSE.txt", "utf8")
+              .split("\n")
+              .map(line => ` * ${line}\n`)
+              .join("")}*/\n\n`
+          )
         )
-      )
-      .pipe(dest(paths.temp))
+        .pipe(dest(paths.temp))
     );
   });
 
@@ -290,13 +292,13 @@ ${fs
   task("copy:compiled", () => {
     return src(["*"], {
       cwd: paths.temp
-    }).pipe(gulpif(file => (files.length > 0 && gulpmatch(file, files)) || files.length === 0, dest(paths.compiled)));
+    }).pipe(gulpif(file => console.log(file) || (files.length > 0 && gulpmatch(file, files)) || files.length === 0, dest(paths.compiled)));
   });
 
   task("compile", () => {
     return src(`${elementName}*.js`, {
-        cwd: paths.temp
-      })
+      cwd: paths.temp
+    })
       .pipe(replace(/^(import .*?)(['"]\.\.\/\.\.\/(?!\.\.\/).*)\.js(['"];)$/gm, "$1$2$3"))
       .pipe(
         rename({
@@ -310,10 +312,10 @@ ${fs
 
   // Delete the temp directory
   task("clean:post", () => del(["*.min.css", "*.umd.js"], {
-      cwd: paths.temp,
-      read: false,
-      allowEmpty: true
-    })
+    cwd: paths.temp,
+    read: false,
+    allowEmpty: true
+  })
   );
 
   task(

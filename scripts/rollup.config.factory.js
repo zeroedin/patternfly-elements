@@ -1,10 +1,10 @@
 import resolve from "rollup-plugin-node-resolve";
 import babel from "rollup-plugin-babel";
 import commonjs from "rollup-plugin-commonjs";
-import { uglify } from "rollup-plugin-uglify";
-import { terser } from "rollup-plugin-terser";
+import {uglify} from "rollup-plugin-uglify";
+import {terser} from "rollup-plugin-terser";
 import replace from "rollup-plugin-re";
-import { get } from "lodash";
+import {get} from "lodash";
 
 const importRegex = /^(import .*?)(['"]\.\.\/\.\.\/(?!\.\.\/).*?)(\.js)?(['"];)$/gm;
 
@@ -40,7 +40,7 @@ function globals(moduleId) {
 }
 
 const babelSettings = {
-  presets: [["env", { modules: false }]],
+  presets: [["env", {modules: false}]],
   plugins: ["external-helpers", "transform-object-rest-spread"]
 };
 
@@ -51,7 +51,7 @@ const paths = {
   temp: "./_temp"
 };
 
-function esmConfig({ elementName, className } = {}) {
+function esmConfig({elementName, className} = {}) {
   return {
     input: `${paths.temp}/${elementName}.js`,
     output: {
@@ -64,7 +64,7 @@ function esmConfig({ elementName, className } = {}) {
   };
 }
 
-function umdConfig({ elementName, className } = {}) {
+function umdConfig({elementName, className} = {}) {
   return {
     input: `${paths.temp}/${elementName}.umd.js`,
     output: {
@@ -91,7 +91,7 @@ function umdConfig({ elementName, className } = {}) {
   };
 }
 
-function esmMinConfig({ elementName, className } = {}) {
+function esmMinConfig({elementName, className} = {}) {
   return {
     input: `${paths.temp}/${elementName}.js`,
     output: {
@@ -120,7 +120,7 @@ function esmMinConfig({ elementName, className } = {}) {
   };
 }
 
-function umdMinConfig({ elementName, className } = {}) {
+function umdMinConfig({elementName, className} = {}) {
   return {
     input: `${paths.temp}/${elementName}.umd.js`,
     output: {
@@ -150,11 +150,11 @@ function umdMinConfig({ elementName, className } = {}) {
   };
 }
 
-export default function factory({ elementName, className } = {}) {
+export default function factory({elementName, className} = {}) {
   return [
-    esmConfig({ elementName, className }),
-    umdConfig({ elementName, className }),
-    esmMinConfig({ elementName, className }),
-    umdMinConfig({ elementName, className })
+    esmConfig({elementName, className}),
+    // umdConfig({elementName, className}),
+    esmMinConfig({elementName, className}),
+    // umdMinConfig({elementName, className})
   ];
 }

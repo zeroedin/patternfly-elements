@@ -1,8 +1,5 @@
 import PFElement from "../../pfelement/dist/pfelement.js";
-// import markdown from "marked/marked.min.js";
-import init, { parse } from "./markdown.js";
-
-const mdReady = init();
+import marked from "marked/marked.min.js";
 
 class PfeMarkdown extends PFElement {
   static get tag() {
@@ -109,12 +106,10 @@ class PfeMarkdown extends PFElement {
     this._muationObserve();
   }
 
-  async renderMarkdown() {
-    // this._markdownRender.innerHTML = marked(this.markdown);
-    await mdReady;
-    console.time("wasm-rust-pulldown-cmark");
-    let md = parse(this.markdown);
-    console.timeEnd("wasm-rust-pulldown-cmark");
+  renderMarkdown() {
+    console.time("js-marked");
+    let md = marked(this.markdown);
+    console.timeEnd("js-marked");
     this._markdownRender.innerHTML = md;
   }
 

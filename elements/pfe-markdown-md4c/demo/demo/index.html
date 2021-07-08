@@ -2,15 +2,12 @@
 <html>
 
 <head>
-  <title>WASM Rust: pulldown_cmark</title>
+  <title>JS marked</title>
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
   <link rel="stylesheet" type="text/css" href="../../pfe-styles/dist/red-hat-font.min.css">
-
-  <link rel="preload" href="/pfe-markdown/dist/markdown_bg.wasm" as="fetch">
-
 
   <!-- Stylesheets for testing light DOM styles.
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.css">
@@ -52,17 +49,39 @@
   </style>
 
   <script>
+    var markdownSample = "Sometimes you want numbered lists:\n\n" +
+      "1. One\n" +
+      "2. Two\n" +
+      "3. Three\n\n" +
+      "Sometimes you want bullet points:\n\n" +
+      "* Start a line with a star\n" +
+      "* Profit!\n\n" +
+      "Alternatively,\n\n" +
+      "- Dashes work just as well\n" +
+      "- And if you have sub points, put two spaces before the dash or star:\n" +
+      "\t- Like this\n"
+    "\t- And this";
+
+    var firstMarkdownSample = "# First Markdown Sample";
+    var secondMarkdownSample = "## Second Markdown Sample";
+
     window.addEventListener("DOMContentLoaded", function () {
-      async function loadSpec() {
-        const res = await fetch("./spec.txt");
-        const md = await res.text();
-        document.querySelector("#markdownSpec")._markdown = md;
-        document.querySelector("#markdownSpec").renderMarkdown().then(() => {
-          performance.measure("markdown-rendered");
-        });
-      }
-      loadSpec();
+      setTimeout(function () {
+        document.querySelector("#markdownTag").innerHTML = markdownSample;
+      }, 1500);
+
+      document.querySelector("#markdownTagSecondTime").innerHTML = firstMarkdownSample;
+
+      setTimeout(function () {
+        document.querySelector("#markdownTagSecondTime").innerHTML = secondMarkdownSample;
+      }, 3000);
+
+      setTimeout(function () {
+        const element = document.querySelector("#markdownTagUpdatedLightDom");
+        element.innerHTML += "\n### This is a heading level 3";
+      }, 1500);
     });
+
   </script>
 </head>
 
@@ -82,14 +101,43 @@
     </pfe-markdown>
   </section>
 
-
-  <section>
-    <h2>Updating the pfe-markdown tag dynamically (a second time)</h2>
-    <pfe-markdown id="markdownSpec">
-      <div pfe-markdown-container></div>
+  <section class="dark-background">
+    <pfe-markdown context="dark">
+      <div pfe-markdown-container># This is a heading on dark
+        Paragraph text.</div>
     </pfe-markdown>
   </section>
 
+  <section>
+    <h2>Using markdown in the light dom</h2>
+    <pfe-markdown>
+      <div pfe-markdown-container># Markdown in the light dom
+        [A link! (not Link from Zelda)](https://access.redhat.com)
+
+        This is pretty easy too. You just need to worry about indentation.</div>
+    </pfe-markdown>
+  </section>
+
+  <section>
+    <h2>Updating the pfe-markdown tag dynamically</h2>
+    <pfe-markdown>
+      <div pfe-markdown-container id="markdownTag"></div>
+    </pfe-markdown>
+  </section>
+
+  <section>
+    <h2>Updating the pfe-markdown tag dynamically (a second time)</h2>
+    <pfe-markdown>
+      <div pfe-markdown-container id="markdownTagSecondTime"></div>
+    </pfe-markdown>
+  </section>
+
+  <section>
+    <h2>Changing the light dom to show that pfe-markdown updates the markdown</h2>
+    <pfe-markdown>
+      <div pfe-markdown-container id="markdownTagUpdatedLightDom">## Here is a headline</div>
+    </pfe-markdown>
+  </section>
 </body>
 
 </html>
