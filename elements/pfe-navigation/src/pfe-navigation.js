@@ -206,6 +206,7 @@ class PfeNavigation extends PFElement {
     this._searchButtonText = this.shadowRoot.querySelector("#secondary-links__button--search-text");
 
     // Elements that don't exist yet
+    this._mainMenu = null;
     this._siteSwitcherToggle = null;
     this._siteSwitcherBackButton = null;
     this._accountComponent = null;
@@ -229,6 +230,8 @@ class PfeNavigation extends PFElement {
       mainMenuRight: null,
       secondaryLinksLeft: null,
     };
+
+    this._mainMenuItems = {};
 
     // To track observers and events and remove them when necessary
     this._customDropdownAlertsObservers = {};
@@ -266,7 +269,6 @@ class PfeNavigation extends PFElement {
       "_getParentToggleAndDropdown",
       "_changeNavigationState",
       "_calculateBreakpointAttribute",
-      "_processSearchSlotChange",
       "_createCustomDropdownToggle",
       "_processCustomDropdowns",
       "_shadowDomInteraction",
@@ -288,10 +290,13 @@ class PfeNavigation extends PFElement {
       "_createLogInLink",
       "_accountToggleClick",
       "_processAccountDropdownChange",
-      "_processAccountSlotChange",
       "_getLastFocusableItemInMobileSlider",
       "_updateAlerts",
+      "_processHostChildren",
+      "_processHostAttributes",
+      "_processLogo",
       "_postProcessLogo",
+      "_processMainMenu",
     ];
 
     for (let index = 0; index < functionsToBind.length; index++) {
@@ -303,12 +308,58 @@ class PfeNavigation extends PFElement {
       }
     }
 
-    // Handle updates to slotted search content
-    this._searchSlot.addEventListener("slotchange", this._processSearchSlotChange);
-    this._accountSlot.addEventListener("slotchange", this._processAccountSlotChange);
-
-    // Setup mutation observer to watch for content changes
-    this._observer = new MutationObserver(this._processLightDom);
+    this._observers = {
+      // Observer used to kick off light DOM processing of logo, mainMenu, account, search, and secondaryLinks
+      hostChildren: {
+        observer: new MutationObserver(this._processHostChildren),
+        config: {
+          childList: true,
+        },
+      },
+      // Used to copy some host attributes into the shadowDom wrapper
+      hostAttributes: {
+        observer: new MutationObserver(this._processHostAttributes),
+        config: {
+          attributes: true,
+          attributeFilter: ['class'],
+        },
+      },
+      // Watches logo for updates and copies it into the shadow DOM
+      logo: {
+        observer: new MutationObserver(this._processLogo),
+        config: {
+          characterData: true,
+          attributes: true,
+          subtree: true,
+          childList: true,
+        },
+        element: null,
+      },
+      // Watches mainMenu for updates and copies it into the shadow DOM
+      mainMenu: {
+        observer: new MutationObserver(this._processMainMenu),
+        config: {
+          characterData: true,
+          attributes: true,
+          subtree: true,
+          childList: true,
+        },
+        element: null,
+      },
+      // Watches account dropdown component for updates
+      // to manage creation of login link or dropdown toggle
+      account: {
+        observer: new MutationObserver(this._processAccountDropdownChange),
+        config: {
+          attributes: true,
+          attributeFilter: [
+            'login-link',
+            'full-name',
+          ],
+        },
+        element: null,
+      }
+    };
 
     // Ensure we close the whole menu and hide the overlay when the overlay is clicked
     this._overlay.addEventListener("click", this._overlayClickHandler);
@@ -338,18 +389,53 @@ class PfeNavigation extends PFElement {
       this.classList.add("pfe-navigation--in-crusty-browser");
     }
 
-    this._processLightDom();
+    // Assess if user prefers reduced motion, which means we can eliminate some timeouts
+    const prefersReducedMotionQuery = window.matchMedia("(prefers-reduced-motion)");
+    this._prefersReducedMotion = prefersReducedMotionQuery.matches || false;
 
-    this._observer.observe(this, lightDomObserverConfig);
+    this._resizeDebounce = 150;
+    // Change a few preferences for automated testing so scripts can run faster
+    if (this.hasAttribute("automated-testing")) {
+      this._resizeDebounce = 10;
+      this._prefersReducedMotion = true;
+    }
 
+    this._processHostChildren(null, true);
+    this._observers.hostChildren.observer.observe(this, this._observers.hostChildren.config);
+    this._processHostAttributes(null, true);
+    this._observers.hostAttributes.observer.observe(this, this._observers.hostAttributes.config);
+
+    // Setup pre-post resize listeners
+    // Pre hides layout changes while resizing
+    // Post evaluates if content fits in new width and may force collapse elements, see breakpoint attribute
     const preResizeAdjustments = () => {
-      this.classList.add("pfe-navigation--is-resizing");
+      if (!this.classList.contains("pfe-navigation--is-resizing")) {
+        this.classList.add("pfe-navigation--is-resizing");
+      }
     };
     this._debouncedPreResizeAdjustments = debounce(preResizeAdjustments, this._resizeDebounce, true);
     window.addEventListener("resize", this._debouncedPreResizeAdjustments);
     this._debouncedPostResizeAdjustments = debounce(this._postResizeAdjustments, this._resizeDebounce);
     window.addEventListener("resize", this._debouncedPostResizeAdjustments, { passive: true });
     this._calculateBreakpointAttribute();
+
+    // Add menu burger behavior
+    this._mobileToggle.addEventListener("click", this._toggleMobileMenu);
+
+    // Add search toggle behavior
+    this._searchToggle.addEventListener("click", this._toggleSearch);
+
+    // General keyboard listener attached to the entire component
+    document.addEventListener("keydown", this._generalKeyboardListener);
+
+    // Set initial on page load aria settings on all original buttons and their dropdowns
+    if (this._currentMobileDropdown) {
+      this._addCloseDropdownAttributes(this._mobileToggle, this._currentMobileDropdown);
+    }
+
+    // Add close attributes to built in dropdowns
+    this._addCloseDropdownAttributes(this._searchToggle, this._searchSpotMd);
+    this._addCloseDropdownAttributes(null, this._accountDropdownWrapper);
 
     // Initial position of this element from the top of the screen
     this._top = this.getBoundingClientRect().top || 0;
@@ -381,11 +467,16 @@ class PfeNavigation extends PFElement {
   } // end connectedCallback()
 
   disconnectedCallback() {
-    this._observer.disconnect();
+    // this._observer.disconnect();
+
+    const oberverKeys = Object.keys(this._observers);
+    for (let index = 0; index < oberverKeys.length; index++) {
+      const observerKey = oberverKeys[index];
+      this._observers[observerKey].observer.disconnect();
+    }
 
     window.removeEventListener("resize", this._debouncedPreResizeAdjustments);
     window.removeEventListener("resize", this._debouncedPostResizeAdjustments);
-    this._searchSlot.removeEventListener("slotchange", this._processSearchSlotChange);
     this._overlay.removeEventListener("click", this._overlayClickHandler);
     this._mobileToggle.removeEventListener("click", this._toggleMobileMenu);
     this._searchToggle.removeEventListener("click", this._toggleSearch);
@@ -898,7 +989,7 @@ class PfeNavigation extends PFElement {
   _changeNavigationState(toggleId, toState) {
     // Preventing issues in IE11 & Edge
     if (_isCrustyBrowser()) {
-      this._observer.disconnect();
+      // this._observer.disconnect();
     }
     const isOpen = this.isOpen(toggleId);
     // Set toState param to go to opposite of current state if toState isn't set
@@ -1025,7 +1116,7 @@ class PfeNavigation extends PFElement {
 
     // Reconnecting mutationObserver for IE11 & Edge
     if (_isCrustyBrowser()) {
-      this._observer.observe(this, lightDomObserverConfig);
+      // this._observer.observe(this, lightDomObserverConfig);
     }
 
     return toState === "open";
@@ -1040,19 +1131,6 @@ class PfeNavigation extends PFElement {
         const openToggleId = this.openToggle;
         this._changeNavigationState(openToggleId, "close");
       }
-    }
-  }
-
-  /**
-   * Add a class to component wrapper if we have a search slot
-   */
-  _processSearchSlotChange() {
-    if (this.hasSlot("search")) {
-      this.classList.add("pfe-navigation--has-search");
-      this._searchToggle.hidden = false;
-    } else {
-      this.classList.remove("pfe-navigation--has-search");
-      this._searchToggle.hidden = true;
     }
   }
 
@@ -1171,7 +1249,7 @@ class PfeNavigation extends PFElement {
     // Preventing issues in IE11 & Edge
     this.log("Processing Custom Dropdowns");
     if (_isCrustyBrowser()) {
-      this._observer.disconnect();
+      // this._observer.disconnect();
     }
     for (let index = 0; index < pfeNavigationDropdowns.length; index++) {
       const pfeNavigationDropdown = pfeNavigationDropdowns[index];
@@ -1329,14 +1407,11 @@ class PfeNavigation extends PFElement {
           pfeNavigationDropdown.prepend(siteSwitcherBackButtonWrapper);
         }
       }
-      // @todo Process custom dropdowns for menus, need to figure out how that'll work
-      // else {
-      // }
     }
 
     // Reconnecting mutationObserver for IE11 & Edge
     if (_isCrustyBrowser()) {
-      this._observer.observe(this, lightDomObserverConfig);
+      // this._observer.observe(this, lightDomObserverConfig);
     }
   }
 
@@ -1443,21 +1518,19 @@ class PfeNavigation extends PFElement {
   }
 
   /**
-   * Handle initialization or changes in light DOM
-   * Clone them into the shadowRoot
-   * @param {array} mutationList Provided by mutation observer
+   * Main observer used to kick off light DOM processing of logo, mainMenu, account, search, and secondaryLinks
+   * @param {object} mutationList Mutation list from mutation observer
+   * @param {boolean} init Set when this function is called manually to initialize the component
    */
-  _processLightDom(mutationList) {
-    // If we're mutating because an attribute on the web component starting with pfe- changed, don't reprocess dom
-    let cancelLightDomProcessing = true;
-    let componentClassesChange = false;
+  _processHostChildren(mutationList, init) {
+    console.log('_processHostChildren', mutationList, init);
+    let childrenToProcess = null;
     let recalculateMenuBreakpoints = false;
-    const ignoredTags = ["PFE-NAVIGATION", "PFE-ICON", "PFE-NAVIGATION-DROPDOWN", "PFE-CTA"];
-    const ie11IgnoredClasses = ["pfe-navigation__dropdown-wrapper", "pfe-navigation__dropdown", "pfe-cta"];
+    if (!init) {
 
-    // On initialization
-    if (!mutationList) {
-      cancelLightDomProcessing = false;
+    }
+    else {
+      childrenToProcess = this.children;
 
       // Process Custom Dropdowns in secondary links area
       // @note Running into issue where custom button text returns "" without the timeout
@@ -1466,9 +1539,531 @@ class PfeNavigation extends PFElement {
         this._processCustomDropdowns(pfeNavigationDropdowns);
       }, 0);
     }
+
+    ///
+    // @note v1.x markup:
+    // Storing transformed markup in a document fragment to minimize DOM writes
+    ///
+    const transformedSecondaryLinks = document.createDocumentFragment();
+    const customDropdownsToProcess = [];
+
+    // Process new children
+    if (childrenToProcess) {
+      for (let index = 0; index < childrenToProcess.length; index++) {
+        const child = childrenToProcess[index];
+
+        if (child.getAttribute('slot') === 'account') {
+          const accountDropdown = child.querySelector('pfe-navigation-account, rh-account-dropdown');
+          if (accountDropdown) {
+            const oldAccountDropdown = this._observers.account.element;
+            if (accountDropdown !== oldAccountDropdown) {
+              if (this._observers.account.observer) {
+                this._observers.account.observer.disconnect();
+              }
+              this._observers.account.element = accountDropdown;
+              this._accountComponent = accountDropdown;
+              this._processAccountDropdownChange(null, true);
+              this._observers.account.observer.observe(
+                this._observers.account.element,
+                this._observers.account.config
+              );
+              recalculateMenuBreakpoints = true;
+            }
+          }
+        }
+
+        ///
+        // Process search slot
+        ///
+        else if (child.getAttribute('slot') === 'search') {
+          this.classList.add('pfe-navigation--has-search');
+          this._searchToggle.hidden = false;
+        }
+
+        ///
+        // @note v1.x markup:
+        // Address skip links, put them at the beginning of the document
+        ///
+        else if (child.getAttribute('slot') === 'skip') {
+          const skipLinks = child;
+          const htmlBody = document.querySelector("body");
+          // Wrapper used to make sure we don't duplicate skip links
+          const skipLinksWrapper = document.createElement("div");
+          skipLinksWrapper.id = "pfe-navigation__1x-skip-links";
+          for (let index = 0; index < skipLinks.length; index++) {
+            skipLinks[index].removeAttribute("slot");
+
+            // Add visually-hidden to the link tags so we can show them when focused on with CSS
+            if (skipLinks[index].tagName === "A") {
+              skipLinks[index].classList.add("visually-hidden", "skip-link");
+            } else {
+              const theRealSkipLinks = skipLinks[index].querySelectorAll("a");
+              for (let j = 0; j < theRealSkipLinks.length; j++) {
+                theRealSkipLinks[j].classList.add("visually-hidden", "skip-link");
+              }
+            }
+            skipLinksWrapper.appendChild(skipLinks[index]);
+          }
+
+          // If we already have an oldSkipLinks, replace it
+          const oldSkipLinksWrapper = document.getElementById("pfe-navigation__1x-skip-links");
+          if (oldSkipLinksWrapper) {
+            oldSkipLinksWrapper.parentElement.replaceChild(skipLinksWrapper, oldSkipLinksWrapper);
+          } else {
+            // Put skip links as the first thing after the body tag
+            htmlBody.prepend(skipLinksWrapper);
+          }
+        }
+
+        ///
+        // @note v1.x markup:
+        // Address secondary links from nav 1.x, need to modify markup and add wrappers to make it work in nav 2.x
+        ///
+        else if (child.tagName.toLowerCase() === 'pfe-navigation-item') {
+          // Accomodating different markup for trigger/toggle
+          const trigger = child.querySelector('[slot="trigger"]');
+          const triggerLink = trigger ? trigger.querySelector("a") : null;
+          // Tray is optional
+          const tray = child.querySelector('[slot="tray"]');
+
+          // These have to be set depending on the markup
+          let shadowTrigger = null;
+          let toggleName = null;
+          if (triggerLink) {
+            shadowTrigger = triggerLink.cloneNode(true);
+            toggleName = triggerLink.innerText;
+          }
+          else if (trigger) {
+            toggleName = trigger.innerText;
+            shadowTrigger = trigger.cloneNode(true);
+            shadowTrigger.removeAttribute("slot");
+          }
+          else {
+            const unslottedChildLink = child.querySelector("a");
+            if (unslottedChildLink) {
+              toggleName = unslottedChildLink.innerText;
+              shadowTrigger = unslottedChildLink;
+            }
+            // If we can't find any of that markup we can't transform the markup
+            else {
+              this.error(
+                "Attempted to transform 1.x secondary link and couldn't find what we needed.",
+                child
+              );
+              break;
+            }
+          }
+
+          // Div Wrapper for secondary links
+          const divWrapper = document.createElement("div");
+          divWrapper.setAttribute("slot", "secondary-links");
+          // If there's a tray, it's a dropdown, setup a pfe-navigation-dropdown
+          if (tray) {
+            // If it's a dropdown, wrap it in pfe-navigation-dropdown
+            const dropdown = document.createElement("pfe-navigation-dropdown");
+            dropdown.dataset.idSuffix = this._createMachineName(toggleName);
+            const toggle = this._createCustomDropdownToggle(
+              dropdown,
+              toggleName,
+              child.getAttribute("pfe-icon")
+            );
+
+            // Copy over any data attributes to the toggle
+            if (triggerLink) {
+              const datasetKeys = Object.keys(triggerLink.dataset);
+              for (let j = 0; j < datasetKeys.length; j++) {
+                const dataKey = datasetKeys[j];
+                toggle.dataset[dataKey] = triggerLink.dataset[dataKey];
+              }
+            }
+
+            dropdown.dropdownWidth = "full";
+            dropdown.classList.add("pfe-navigation__dropdown--default-styles", "pfe-navigation__dropdown--1-x");
+            dropdown.appendChild(child);
+
+            divWrapper.appendChild(toggle);
+            divWrapper.appendChild(dropdown);
+            transformedSecondaryLinks.appendChild(divWrapper);
+            customDropdownsToProcess.push(dropdown);
+          }
+          // Otherwise this is just a link with an icon
+          else {
+            shadowTrigger.classList.add("pfe-navigation__secondary-link");
+            shadowTrigger.innerHTML = toggleName;
+            shadowTrigger.prepend(this._createPfeIcon(child.icon));
+            divWrapper.appendChild(shadowTrigger);
+            transformedSecondaryLinks.appendChild(divWrapper);
+          }
+
+          recalculateMenuBreakpoints = true;
+        }
+
+        ///
+        // Process Nav Wrapper
+        // Have to check class and tagName because ShadyCSS adds pfe-navigation class to everything >:(
+        ///
+        else if (child.classList && child.classList.contains('pfe-navigation') && child.tagName.toLowerCase() === 'nav') {
+
+          // Process Logo
+          const newLogo = child.querySelector('#pfe-navigation__logo-wrapper, [slot="logo"]');
+          const oldLogo = this._observers.logo.element;
+          if (oldLogo !== newLogo) {
+            // Redo the observer
+            this._observers.logo.observer.disconnect();
+            this._observers.logo.element = newLogo;
+            this._processLogo(null, true);
+            this._observers.logo.observer.observe(
+              this._observers.logo.element,
+              this._observers.logo.config
+            );
+            recalculateMenuBreakpoints = true;
+          }
+
+          // Find Main menu
+          const oldMainMenu = this._observers.mainMenu.element;
+          let newMainMenu = child.querySelector('#pfe-navigation__menu');
+          if (!newMainMenu) {
+            newMainMenu = this.querySelector("pfe-navigation-main > ul");
+          }
+
+          // Process Main Menu
+          if (newMainMenu && oldMainMenu !== newMainMenu) {
+            // Redo the observer
+            this._observers.mainMenu.observer.disconnect();
+            this._observers.mainMenu.element = newMainMenu;
+            this._processMainMenu(null, true);
+            this._observers.mainMenu.observer.observe(
+              this._observers.mainMenu.element,
+              this._observers.mainMenu.config
+            );
+            recalculateMenuBreakpoints = true;
+          }
+        }
+      }
+    }
+
+    // Process any custom dropdowns
+    if (customDropdownsToProcess.length) {
+      this._processCustomDropdowns(customDropdownsToProcess);
+    }
+
+    // Write our transformed 1.x markup to the DOM
+    if (transformedSecondaryLinks.length) {
+      this.appendChild(transformedSecondaryLinks);
+    }
+
+    // Throw errors for required elements that are missing
+    if (!this._observers.logo.element) {
+      this.warn("Cannot find a logo in the component tag.");
+    }
+
+    // Recalculate main menu breakpoint
+    this._menuBounds.mainMenuRight = null;
+    recalculateMenuBreakpoints = true;
+
+    // Re-set pointers to commonly used elements that just got paved over
+    this._menuDropdownXs = this.shadowRoot.getElementById("mobile__dropdown");
+    this._menuDropdownMd = this.shadowRoot.getElementById("pfe-navigation__menu-wrapper");
+    if (!this._menuDropdownMd) {
+      this.classList.add("pfe-navigation--no-main-menu");
+    }
+
+    // Recalculate JS breakpoint and related layout state
+    // Using setTimeout to put this off until there's a spare cycle
+    if (recalculateMenuBreakpoints) {
+      window.setTimeout(() => {
+        this._calculateMenuBreakpoints();
+        this._calculateBreakpointAttribute();
+        this._setCurrentMobileDropdown();
+        // If we have a mobile dropdown make sure it has dropdown attributes
+        if (this._currentMobileDropdown) {
+          this._addCloseDropdownAttributes(this._mobileToggle, this._currentMobileDropdown);
+        }
+        this._moveSearchSlot();
+      }, 0);
+    }
+
+    // Some cleanup and state management for after render
+    const postProcessHostChildren = () => {
+      // Preventing issues in IE11 & Edge
+      if (_isCrustyBrowser()) {
+        // this._observer.disconnect();
+      }
+
+      if (this.isMobileMenuButtonVisible() && !this.isOpen("mobile__button")) {
+        this._addCloseDropdownAttributes(this._mobileToggle, this._currentMobileDropdown);
+      }
+
+      // Mobile slider elements have a tab trap that will need to be updated if content has been updated
+      const mobileSliderElements = this.querySelectorAll("[mobile-slider]");
+      for (let index = 0; index < mobileSliderElements.length; index++) {
+        const currentMobileSliderElement = mobileSliderElements[index];
+        this._getLastFocusableItemInMobileSlider(currentMobileSliderElement);
+        const toggle = currentMobileSliderElement.querySelector(".pfe-navigation__secondary-link");
+        const dropdown = currentMobileSliderElement.querySelector(".pfe-navigation__dropdown");
+
+        // Add mutation observer if we don't have one already
+        if (toggle && toggle.id && dropdown && !this._mobileSliderMutationObservers[toggle.id]) {
+          this._mobileSliderMutationObservers[toggle.id] = new MutationObserver(() =>
+            this._getLastFocusableItemInMobileSlider(currentMobileSliderElement)
+          );
+          this._mobileSliderMutationObservers[toggle.id].observe(dropdown, { subtree: true, childList: true });
+        }
+      }
+
+      // Reconnecting mutationObserver for IE11 & Edge
+      if (_isCrustyBrowser()) {
+        // this._observer.observe(this, lightDomObserverConfig);
+      }
+    };
+
+    window.setTimeout(postProcessHostChildren, 0);
+  }
+
+  /**
+   * When classes on host change this copies them to wrapper in shadow DOM
+   */
+  _processHostAttributes() {
+    this.log('_processHostAttributes');
+    this._shadowDomOuterWrapper.setAttribute("class", `pfe-navigation__wrapper ${this.getAttribute("class")}`);
+  }
+
+  /**
+   * Watches logo for updates and copies it into the shadow DOM
+   * @param {object} mutationList Mutation list from mutation observer
+   * @param {boolean} init Set when this function is called manually to initialize the component
+   */
+  _processLogo(mutationList, init) {
+    console.log('_processLogo', mutationList, init);
+    const lightLogo = this._observers.logo.element;
+    if (init) {
+      // Making sure this is nav 2.0 markup
+      if (lightLogo.id === 'pfe-navigation__logo-wrapper' && !lightLogo.hasAttribute('slot')) {
+        const newShadowLogoWrapper = lightLogo.cloneNode(true);
+        if (this._logoWrapper) {
+          this._shadowDomOuterWrapper.replaceChild(newShadowLogoWrapper, this._logoWrapper);
+        } else {
+          this._shadowDomOuterWrapper.prepend(newShadowLogoWrapper);
+        }
+        // Re-set pointer since old element doesn't exist
+        this._logoWrapper = newShadowLogoWrapper;
+      }
+      // @note v1.x markup:
+      else {
+        const logoLinkCopy = lightLogo.cloneNode(true);
+        const logoLinkWrapper = document.createElement("div");
+        logoLinkWrapper.classList.add("pfe-navigation__logo-wrapper");
+        logoLinkWrapper.setAttribute("id", "pfe-navigation__logo-wrapper");
+
+        logoLinkCopy.removeAttribute("slot");
+        logoLinkCopy.classList.add("pfe-navigation__logo-link");
+        logoLinkWrapper.prepend(logoLinkCopy);
+
+        // Add it to the shadow DOM
+        if (this._logoWrapper) {
+          this._logoWrapper.parentElement.replaceChild(logoLinkWrapper, this._logoWrapper);
+        } else {
+          this._shadowDomOuterWrapper.prepend(logoLinkWrapper);
+        }
+        // Re-set pointer since old element doesn't exist
+        this._logoWrapper = logoLinkWrapper;
+      }
+    }
+
+    this._postProcessLogo();
+  }
+
+  /**
+   * Watches mainMenu for updates and copies it into the shadow DOMu
+   * @param {object} mutationList Mutation list from mutation observer
+   * @param {boolean} init Set when this function is called manually to initialize the component
+   */
+  _processMainMenu(mutationList, init) {
+    console.log('_processMainMenu', mutationList, init);
+    const mainMenu = this._observers.mainMenu.element;
+    let menuItemsToProcess = null;
+    if (!init) {
+
+    }
+    else {
+      menuItemsToProcess = mainMenu.children;
+    }
+
+
+    // @note v1.x markup:
+    // Add selectors needed for the menu to behave well in 2.x
+    const hasOneXMenuMarkup = mainMenu.parentElement.tagName.toLowerCase() === 'pfe-navigation-main';
+    if (init && hasOneXMenuMarkup) {
+      if (lightMenu && lightMenu.id !== "pfe-navigation__menu") {
+        lightMenu.id = "pfe-navigation__menu";
+        lightMenu.classList.add("pfe-navigation__menu");
+      }
+    }
+
+    const processMenuItem = (menuItem) => {
+      // Create a content ID for storing pointers to shadow DOM versions
+      // and keeping order of menu items in light DOM the same as the shadowDOM
+      let menuItemDataId = menuItem.dataset.menuItemId;
+      if (!menuItemDataId) {
+        menuItemDataId = `${Math.random().toString(36).substr(2, 9)}`
+        menuItem.dataset.menuItemId = menuItemDataId;
+      }
+
+      const menuItemClone = menuItem.cloneNode(true);
+
+      // @note v1.x markup:
+      // Address menu items by adding class hooks we need to import into shadowDom
+      // and classes we need to maintain appropriate styles
+      const pfeNavigationItem = menuItemClone.querySelector('pfe-navigation-item');
+      if (pfeNavigationItem) {
+        const pfeNavigationItem = pfeNavigationItems[index];
+        menuItemClone.classList.add("pfe-navigation__menu-item");
+        // Address menu toggle
+        let triggerLink = pfeNavigationItem.querySelector('[slot="trigger"] a');
+        if (!triggerLink && pfeNavigationItem.children[0].tagName === "A") {
+          triggerLink = pfeNavigationItem.children[0];
+        }
+
+        if (triggerLink) {
+          triggerLink.classList.add("pfe-navigation__menu-link");
+          menuItemClone.prepend(triggerLink);
+        } else {
+          this.error("Wasn't able to locate the toggle for a pfe-navigation item", pfeNavigationItem);
+        }
+
+        // Address menu dropdown
+        let navItemTrayContent =
+          pfeNavigationItem.querySelector(".pfe-navigation-grid") ||
+          pfeNavigationItem.querySelector(".pfe-navigation__dropdown") ||
+          pfeNavigationItem.querySelector("[slot='tray']");
+        if (navItemTrayContent) {
+          navItemTrayContent.classList.add("pfe-navigation__dropdown");
+          const pfeNavigationItemFooter = pfeNavigationItem.querySelector(".pfe-navigation--footer");
+          if (pfeNavigationItemFooter) {
+            pfeNavigationItemFooter.classList.add("pfe-navigation__footer");
+            navItemTrayContent.appendChild(pfeNavigationItemFooter);
+          }
+          menuItemClone.appendChild(navItemTrayContent);
+        } else {
+          this.error("Wasn't able to locate dropdown in pfe-navigation-item", pfeNavigationItem);
+        }
+
+        // Remove the rest
+        menuItemClone.removeChild(pfeNavigationItem);
+      }
+
+      // Begine Nav 2.0 processing
+      let menuLink = menuItemClone.querySelector(".pfe-navigation__menu-link");
+      let dropdown = menuItemClone.querySelector(".pfe-navigation__dropdown");
+
+      if (dropdown) {
+        // Convert dropdown links into buttons
+        const toggle = document.createElement("button");
+
+        // Move over or add important attributes and content
+        toggle.setAttribute("class", menuLink.getAttribute("class"));
+        toggle.classList.add("pfe-navigation__menu-link--has-dropdown");
+
+        toggle.innerHTML = menuLink.innerHTML;
+        // Keep data attributes from link with the button
+        // Intended to maintain analytics data attributes
+        const menuLinkAttributes = menuLink.getAttributeNames();
+        for (let index = 0; index < menuLinkAttributes.length; index++) {
+          const currentAttribute = menuLinkAttributes[index];
+          if (currentAttribute.startsWith("data-")) {
+            toggle.setAttribute(currentAttribute, menuLink.getAttribute(currentAttribute));
+          }
+        }
+        toggle.dataset.machineName = this._createMachineName(menuLink.text);
+
+        // Add dropdown behavior
+        toggle.addEventListener("click", this._dropdownItemToggle);
+        menuItemClone.replaceChild(toggle, menuLink);
+
+        // Set Id's for the button and dropdown and add their ID's to the parent li for easy access
+        const toggleId = `main-menu__button--${toggle.dataset.machineName}`;
+        const dropdownId = `main-menu__dropdown--${toggle.dataset.machineName}`;
+        toggle.setAttribute("id", toggleId);
+
+        // Create wrapper for dropdown and give it appropriate classes and attributes
+        // If there isn't one already
+        let dropdownWrapper =
+          dropdown.parentElement.classList.contains('pfe-navigation__dropdown-wrapper') ?
+            dropdown.parentElement :
+            null;
+        if (!dropdownWrapper) {
+          dropdownWrapper = document.createElement("div");
+
+          dropdownWrapper.classList.add("pfe-navigation__dropdown-wrapper");
+          if (dropdown.classList.contains("pfe-navigation__dropdown--single-column")) {
+            dropdownWrapper.classList.add("pfe-navigation__dropdown-wrapper--single-column");
+          }
+
+          dropdownWrapper.setAttribute("id", dropdownId);
+
+          dropdownWrapper.appendChild(dropdown);
+          menuItemClone.appendChild(dropdownWrapper);
+          menuItemClone.dataset.dropdownId = dropdownId;
+          toggle.setAttribute("aria-controls", dropdownId);
+        }
+
+        // Add custom event for interactive elements in shadowDom so anayltics can capture them acccurately
+        // We'll omit elements that have custom events already to avoid double reporting
+        const focusableElements = dropdownWrapper.querySelectorAll(this._focusableElements);
+        for (let index = 0; index < focusableElements.length; index++) {
+          const currentElement = focusableElements[index];
+          currentElement.addEventListener("click", this._shadowDomInteraction);
+        }
+        // Set everything to closed by default
+        this._addCloseDropdownAttributes(toggle, dropdownWrapper);
+      }
+
+      if (this._mainMenuItems[menuItemDataId]) {
+        this._mainMenuItems[menuItemDataId].remove();
+      }
+      this._mainMenuItems[menuItemDataId] = menuItemClone;
+    }; // End processMenuItem
+
+    if (menuItemsToProcess) {
+      if (!this._mainMenu) {
+        this._mainMenu = document.createElement('ul');
+        this._mainMenu.classList.add('pfe-navigation__menu');
+        this._mainMenu.id = 'pfe-navigation__menu';
+        this._shadowMenuWrapper.append(this._mainMenu);
+      }
+
+      const menuItemOrder = [];
+      for (let index = 0; index < menuItemsToProcess.length; index++) {
+        const menuItem = menuItemsToProcess[index];
+        processMenuItem(menuItem);
+        menuItemOrder.push(menuItem.dataset.menuItemId);
+      }
+
+      for (let index = 0; index < menuItemOrder.length; index++) {
+        const menuItemId = menuItemOrder[index];
+        this._mainMenu.append(this._mainMenuItems[menuItemId]);
+      }
+    }
+  }
+
+  /**
+   * Handle initialization or changes in light DOM
+   * Clone them into the shadowRoot
+   * @param {array} mutationList Provided by mutation observer
+   */
+  _processLightDom(mutationList) {
+    // If we're mutating because an attribute on the web component starting with pfe- changed, don't reprocess dom
+    let cancelLightDomProcessing = true;
+    const ignoredTags = ["PFE-NAVIGATION", "PFE-ICON", "PFE-NAVIGATION-DROPDOWN", "PFE-CTA"];
+    const ie11IgnoredClasses = ["pfe-navigation__dropdown-wrapper", "pfe-navigation__dropdown", "pfe-cta"];
+
+    // On initialization
+    if (!mutationList) {
+      cancelLightDomProcessing = false;
+    }
     // On Mutation we get a mutationList, check to see if there are important changes to react to
     // If not hop out of this function early
-    else if (mutationList.length) {
+    else {
       for (let index = 0; index < mutationList.length; index++) {
         const mutationItem = mutationList[index];
         const oneXSlotsNotIn2x = ["skip", "logo", "trigger", "tray"];
@@ -1489,9 +2084,9 @@ class PfeNavigation extends PFElement {
 
           if (!ignoreThisMutation) {
             const customDropdownsToProcess = [];
-            if (mutationItem && mutationItem.addedNodes) {
-              for (let k = 0; k < mutationItem.addedNodes.length; k++) {
-                const addedNode = mutationItem.addedNodes[k];
+            if (mutationItem.addedNodes) {
+              for (let j = 0; j < mutationItem.addedNodes.length; j++) {
+                const addedNode = mutationItem.addedNodes[j];
                 if (
                   addedNode.nodeType === 1 &&
                   addedNode.hasAttribute("slot") &&
@@ -1539,7 +2134,7 @@ class PfeNavigation extends PFElement {
 
         if (!ignoreThisMutation && !mutationItem.target && mutationItem.type === "attributes") {
           // Updates to PFE elements should be ignored
-          if (stringStartsWith(mutationItem.target.tagName, "PFE")) {
+          if (mutationItem.target.tagName.startsWith("PFE")) {
             if (
               mutationItem.attributeName === "pfelement" ||
               mutationItem.attributeName === "class" ||
@@ -1551,12 +2146,7 @@ class PfeNavigation extends PFElement {
         }
 
         if (!ignoreThisMutation) {
-          if (
-            mutationItem.target.tagName === "PFE-NAVIGATION-ACCOUNT" ||
-            mutationItem.target.tagName === "RH-ACCOUNT-DROPDOWN"
-          ) {
-            this._processAccountDropdownChange(mutationItem);
-          } else if (mutationItem.type === "characterData") {
+          if (mutationItem.type === "characterData") {
             // Process text changes
             cancelLightDomProcessing = false;
           }
@@ -1575,12 +2165,12 @@ class PfeNavigation extends PFElement {
                   // We need to update attribute changes
                   cancelLightDomProcessing = false;
                 }
-                if (mutationItem.type === "childList" && mutationList.addedNodes && mutationList.addedNodes.length) {
+                if (mutationItem.type === "childList") {
                   for (let j = 0; index < mutationList.addedNodes.length; j++) {
                     const addedNode = mutationList.addedNodes[j];
                     // We need to update on tree changes if they aren't in a slot
                     if (!addedNode.hasAttribute("slot") || !addedNode.closest("[slot]")) {
-                      cancelLightDomProcessing = false;
+                      cancelLightDomning = false;
                     }
                   }
                 }
@@ -1593,19 +2183,14 @@ class PfeNavigation extends PFElement {
 
     // Preventing issues in IE11 & Edge
     if (_isCrustyBrowser()) {
-      this._observer.disconnect();
+      // this._observer.disconnect();
     }
 
-    // Handle class updates to the parent component
-    // Copying them to shadow DOM to avoid compound :host() selectors
-    if (componentClassesChange) {
-      this._shadowDomOuterWrapper.setAttribute("class", `pfe-navigation__wrapper ${this.getAttribute("class")}`);
-    }
 
     if (cancelLightDomProcessing) {
       // Reconnecting mutationObserver for IE11 & Edge
       if (_isCrustyBrowser()) {
-        this._observer.observe(this, lightDomObserverConfig);
+        // this._observer.observe(this, lightDomObserverConfig);
       }
 
       this.log("Cancelled light DOM processing", mutationList);
@@ -1615,220 +2200,28 @@ class PfeNavigation extends PFElement {
 
     // Begins the wholesale replacement of most of the shadowDOM -------------------------------
     this.log("_processLightDom: replacing shadow DOM", mutationList);
-    // New nav element we'll populate and replace the old one with later
-    const newShadowMenuWrapper = document.createElement("nav");
-
-    ///
-    // @note v1.x markup:
-    // Address skip links, put them at the beginning of the document
-    ///
-    const htmlBody = document.querySelector("body");
-    const skipLinks = this.querySelectorAll('[slot="skip"]');
-    if (skipLinks.length) {
-      // Wrapper used to make sure we don't duplicate skip links
-      const skipLinksWrapper = document.createElement("div");
-      skipLinksWrapper.id = "pfe-navigation__1x-skip-links";
-      for (let index = 0; index < skipLinks.length; index++) {
-        skipLinks[index].removeAttribute("slot");
-
-        // Add visually-hidden to the link tags so we can show them when focused on with CSS
-        if (skipLinks[index].tagName === "A") {
-          skipLinks[index].classList.add("visually-hidden", "skip-link");
-        } else {
-          const theRealSkipLinks = skipLinks[index].querySelectorAll("a");
-          for (let j = 0; j < theRealSkipLinks.length; j++) {
-            theRealSkipLinks[j].classList.add("visually-hidden", "skip-link");
-          }
-        }
-        skipLinksWrapper.appendChild(skipLinks[index]);
-      }
-
-      // If we already have an oldSkipLinks, replace it
-      const oldSkipLinksWrapper = document.getElementById("pfe-navigation__1x-skip-links");
-      if (oldSkipLinksWrapper) {
-        oldSkipLinksWrapper.parentElement.replaceChild(skipLinksWrapper, oldSkipLinksWrapper);
-      } else {
-        // Put skip links as the first thing after the body tag
-        htmlBody.prepend(skipLinksWrapper);
-      }
-    }
-
-    ///
-    // Add the logo to the correct part of the shadowDom
-    ///
-    let lightLogo = this.querySelector("#pfe-navigation__logo-wrapper");
-    if (lightLogo) {
-      const newShadowLogoWrapper = lightLogo.cloneNode(true);
-      if (this._logoWrapper) {
-        this._shadowDomOuterWrapper.replaceChild(newShadowLogoWrapper, this._logoWrapper);
-      } else {
-        this._shadowDomOuterWrapper.prepend(newShadowLogoWrapper);
-      }
-      // Re-set pointer since old element doesn't exist
-      this._logoWrapper = newShadowLogoWrapper;
-    }
-    // @note v1.x markup:
-    // Address logo
-    else {
-      lightLogo = this.querySelector('[slot="logo"]');
-      if (lightLogo) {
-        const logoLinkCopy = logoLink.cloneNode(true);
-        const logoLinkWrapper = document.createElement("div");
-        logoLinkWrapper.classList.add("pfe-navigation__logo-wrapper");
-        logoLinkWrapper.setAttribute("id", "pfe-navigation__logo-wrapper");
-
-        logoLinkCopy.removeAttribute("slot");
-        logoLinkCopy.classList.add("pfe-navigation__logo-link");
-        logoLinkWrapper.prepend(logoLinkCopy);
-
-        // Add it to the shadow DOM
-        if (this._logoWrapper) {
-          this._logoWrapper.parentElement.replaceChild(logoLinkWrapper, this._logoWrapper);
-        } else {
-          this._shadowDomOuterWrapper.prepend(logoLinkWrapper);
-        }
-        // Re-set pointer since old element doesn't exist
-        this._logoWrapper = logoLinkWrapper;
-      } else {
-        this.log("Cannot find a logo in the component tag.");
-      }
-    }
-
-    this._postProcessLogo();
-
-    ///
-    // Add the menu to the correct part of the shadowDom
-    ///
-    let lightMenu = this.querySelector("#pfe-navigation__menu");
-    let hasOneXMenuMarkup = false;
-    const pfeNavigationMain = this.querySelector("pfe-navigation-main");
-    if (pfeNavigationMain || this.querySelector("pfe-navigation-item")) {
-      hasOneXMenuMarkup = true;
-    }
-
-    // @note v1.x markup:
-    // Add selectors needed for the menu to behave well in 2.x
-    if (!lightMenu) {
-      if (pfeNavigationMain) {
-        lightMenu = this.querySelector("pfe-navigation-main > ul");
-        if (lightMenu && lightMenu.id !== "pfe-navigation__menu") {
-          lightMenu.id = "pfe-navigation__menu";
-          lightMenu.classList.add("pfe-navigation__menu");
-
-          // Add necessary classes to li
-          for (let index = 0; index < lightMenu.children.length; index++) {
-            lightMenu.children[index].classList.add("pfe-navigation__menu-item");
-          }
-        }
-
-        // Add necessary classes to top level links
-        const oneXTopLevelLinks = lightMenu.querySelectorAll('[slot="trigger"] a');
-        for (let index = 0; index < oneXTopLevelLinks.length; index++) {
-          oneXTopLevelLinks[index].classList.add("pfe-navigation__menu-link");
-        }
-      }
-    }
 
     ///
     // @note v1.x markup:
     // Address secondary links by transforming markup and adding it
     ///
-    const customDropdownsToProcess = [];
-    // Storing transformed markup in a document fragment to minimize DOM writes
-    const transformedSecondaryLinks = document.createDocumentFragment();
+
     if (hasOneXMenuMarkup) {
       for (let index = 0; index < this.children.length; index++) {
         const pfeNavigationChild = this.children[index];
         if (pfeNavigationChild.tagName === "PFE-NAVIGATION-ITEM") {
-          // Trigger is optional
-          const trigger = pfeNavigationChild.querySelector('[slot="trigger"]');
-          // Trigger link is also optional
-          const triggerLink = trigger ? trigger.querySelector("a") : null;
-          // Tray is optional
-          const tray = pfeNavigationChild.querySelector('[slot="tray"]');
 
-          // These have to be set depending on the markup
-          let shadowTrigger = null;
-          let toggleName = null;
-          if (triggerLink) {
-            shadowTrigger = triggerLink.cloneNode(true);
-            toggleName = triggerLink.innerText;
-          } else if (trigger) {
-            toggleName = trigger.innerText;
-            shadowTrigger = trigger.cloneNode(true);
-            shadowTrigger.removeAttribute("slot");
-          } else {
-            const unslottedChildLink = pfeNavigationChild.querySelector("a");
-            if (unslottedChildLink) {
-              toggleName = unslottedChildLink.innerText;
-              shadowTrigger = unslottedChildLink;
-            }
-            // If we can't find any of that markup we can't transform the markup
-            else {
-              this.error(
-                "Attempted to transform 1.x secondary link and couldn't find what we needed.",
-                pfeNavigationChild
-              );
-              break;
-            }
-          }
-
-          // Div Wrapper for secondary links
-          const divWrapper = document.createElement("div");
-          divWrapper.setAttribute("slot", "secondary-links");
-          // If there's a tray, it's a dropdown, setup a pfe-navigation-dropdown
-          if (tray) {
-            // If it's a dropdown, wrap it in pfe-navigation-dropdown
-            const dropdown = document.createElement("pfe-navigation-dropdown");
-            dropdown.dataset.idSuffix = this._createMachineName(toggleName);
-            const toggle = this._createCustomDropdownToggle(
-              dropdown,
-              toggleName,
-              pfeNavigationChild.getAttribute("pfe-icon")
-            );
-
-            // Copy over any data attributes to the toggle
-            if (triggerLink) {
-              const datasetKeys = Object.keys(triggerLink.dataset);
-              for (let j = 0; j < datasetKeys.length; j++) {
-                const dataKey = datasetKeys[j];
-                toggle.dataset[dataKey] = triggerLink.dataset[dataKey];
-              }
-            }
-
-            dropdown.dropdownWidth = "full";
-            dropdown.classList.add("pfe-navigation__dropdown--default-styles", "pfe-navigation__dropdown--1-x");
-            dropdown.appendChild(pfeNavigationChild);
-
-            divWrapper.appendChild(toggle);
-            divWrapper.appendChild(dropdown);
-            transformedSecondaryLinks.appendChild(divWrapper);
-            customDropdownsToProcess.push(dropdown);
-          }
-          // Otherwise this is just a link with an icon
-          else {
-            shadowTrigger.classList.add("pfe-navigation__secondary-link");
-            shadowTrigger.innerHTML = toggleName;
-            shadowTrigger.prepend(this._createPfeIcon(pfeNavigationChild.icon));
-            divWrapper.appendChild(shadowTrigger);
-            transformedSecondaryLinks.appendChild(divWrapper);
-          }
         }
       }
     }
 
-    // Write our transformed 1.x markup to the DOM
-    this.appendChild(transformedSecondaryLinks);
 
-    // Process any custom dropdowns
-    if (customDropdownsToProcess.length) {
-      this._processCustomDropdowns(customDropdownsToProcess);
-    }
+
 
     // Ensure we're still disconnected after _processCustomDropdowns
     // Preventing issues in IE11 & Edge
     if (_isCrustyBrowser()) {
-      this._observer.disconnect();
+      // this._observer.disconnect();
     }
 
     ///
@@ -1846,115 +2239,6 @@ class PfeNavigation extends PFElement {
 
       // Copy light DOM menu into new wrapper, to be put in shadow DOM after manipulations
       newShadowMenuWrapper.appendChild(lightMenu.cloneNode(true));
-
-      // @note v1.x markup:
-      // Address menu items by adding class hooks we need to import into shadowDom
-      // and classes we need to maintain appropriate styles
-      if (hasOneXMenuMarkup) {
-        // Remove pfe-navigation-item tag, but keep the important children elements
-        const pfeNavigationItems = newShadowMenuWrapper.querySelectorAll("pfe-navigation-item");
-        for (let index = 0; index < pfeNavigationItems.length; index++) {
-          const pfeNavigationItem = pfeNavigationItems[index];
-
-          const menuListItem = pfeNavigationItem.closest("li");
-          menuListItem.classList.add("pfe-navigation__menu-item");
-          // Address menu toggle
-          let menuItemLink = pfeNavigationItem.querySelector('[slot="trigger"] a');
-          if (!menuItemLink && pfeNavigationItem.children[0].tagName === "A") {
-            menuItemLink = pfeNavigationItem.children[0];
-          }
-          if (menuItemLink) {
-            menuItemLink.classList.add("pfe-navigation__menu-link");
-            menuListItem.prepend(menuItemLink);
-          } else {
-            this.error("Wasn't able to process toggle", pfeNavigationItem);
-          }
-
-          // Address menu dropdown
-          let menuItemDropdown =
-            pfeNavigationItem.querySelector(".pfe-navigation-grid") ||
-            pfeNavigationItem.querySelector(".pfe-navigation__dropdown") ||
-            pfeNavigationItem.querySelector("[slot='tray']");
-          if (menuItemDropdown) {
-            menuItemDropdown.classList.add("pfe-navigation__dropdown");
-            const pfeNavigationItemFooter = pfeNavigationItem.querySelector(".pfe-navigation--footer");
-            if (pfeNavigationItemFooter) {
-              pfeNavigationItemFooter.classList.add("pfe-navigation__footer");
-              menuItemDropdown.appendChild(pfeNavigationItemFooter);
-            }
-            menuListItem.appendChild(menuItemDropdown);
-          } else {
-            this.error("Wasn't able to process dropdown", pfeNavigationItem);
-          }
-
-          // Remove the rest
-          menuListItem.removeChild(pfeNavigationItem);
-        }
-      }
-
-      // Add menu dropdown toggle behavior
-      const dropdowns = newShadowMenuWrapper.querySelectorAll(".pfe-navigation__dropdown");
-      for (let index = 0; index < dropdowns.length; index++) {
-        const dropdown = dropdowns[index];
-        const dropdownLink = dropdown.parentElement.querySelector(".pfe-navigation__menu-link");
-
-        if (!dropdownLink) {
-          this.warn("Could not find link to create toggle for dropdown", dropdown);
-          break;
-        }
-
-        // Convert dropdown links into buttons
-        const dropdownButton = document.createElement("button");
-
-        // Move over or add important attributes and content
-        dropdownButton.setAttribute("class", dropdownLink.getAttribute("class"));
-        dropdownButton.classList.add("pfe-navigation__menu-link--has-dropdown");
-
-        dropdownButton.innerHTML = dropdownLink.innerHTML;
-        // Keep data attributes from link with the button
-        const dropdownLinkAttributes = dropdownLink.getAttributeNames();
-        for (let index = 0; index < dropdownLinkAttributes.length; index++) {
-          const currentAttribute = dropdownLinkAttributes[index];
-          if (stringStartsWith(currentAttribute, "data-")) {
-            dropdownButton.setAttribute(currentAttribute, dropdownLink.getAttribute(currentAttribute));
-          }
-        }
-        dropdownButton.dataset.machineName = this._createMachineName(dropdownLink.innerText);
-
-        // Add dropdown behavior
-        dropdownButton.addEventListener("click", this._dropdownItemToggle);
-        dropdownLink.parentElement.replaceChild(dropdownButton, dropdownLink);
-
-        // Set Id's for the button and dropdown and add their ID's to the parent li for easy access
-        const dropdownButtonId = `main-menu__button--${dropdownButton.dataset.machineName}`;
-        const dropdownId = `main-menu__dropdown--${dropdownButton.dataset.machineName}`;
-        dropdownButton.setAttribute("id", dropdownButtonId);
-
-        // Create wrapper for dropdown and give it appropriate classes and attributes
-        const dropdownWrapper = document.createElement("div");
-
-        dropdownWrapper.classList.add("pfe-navigation__dropdown-wrapper");
-        if (dropdown.classList.contains("pfe-navigation__dropdown--single-column")) {
-          dropdownWrapper.classList.add("pfe-navigation__dropdown-wrapper--single-column");
-        }
-        dropdownWrapper.setAttribute("id", dropdownId);
-
-        dropdownWrapper.appendChild(dropdown);
-        dropdownButton.parentElement.appendChild(dropdownWrapper);
-        dropdownButton.parentElement.dataset.dropdownId = dropdownId;
-        dropdownButton.setAttribute("aria-controls", dropdownId);
-
-        // Add custom event for interactive elements in shadowDom so anayltics can capture them acccurately
-        // We'll omit elements that have custom events already to avoid double reporting
-        const focusableElements = dropdownWrapper.querySelectorAll(this._focusableElements);
-        for (let index = 0; index < focusableElements.length; index++) {
-          const currentElement = focusableElements[index];
-          currentElement.addEventListener("click", this._shadowDomInteraction);
-        }
-
-        // Set everything to closed by default
-        this._addCloseDropdownAttributes(dropdownButton, dropdownWrapper);
-      }
     }
     //--------------------------------------------------
     // End best time to manipulate DOM in nav
@@ -1964,93 +2248,16 @@ class PfeNavigation extends PFElement {
     this._shadowMenuWrapper.parentElement.replaceChild(newShadowMenuWrapper, this._shadowMenuWrapper);
     this._shadowMenuWrapper = newShadowMenuWrapper;
 
-    // Recalculate main menu breakpoint
-    this._menuBounds.mainMenuRight = null;
-    recalculateMenuBreakpoints = true;
-
-    // Re-set pointers to commonly used elements that just got paved over
-    this._menuDropdownXs = this.shadowRoot.getElementById("mobile__dropdown");
-    this._menuDropdownMd = this.shadowRoot.getElementById("pfe-navigation__menu-wrapper");
-    if (!this._menuDropdownMd) {
-      this.classList.add("pfe-navigation--no-main-menu");
-    }
-
-    // Add menu burger behavior
-    this._mobileToggle.addEventListener("click", this._toggleMobileMenu);
-
-    // Add search toggle behavior
-    this._searchToggle.addEventListener("click", this._toggleSearch);
-
-    // General keyboard listener attached to the entire component
-    document.addEventListener("keydown", this._generalKeyboardListener);
-
-    // Set initial on page load aria settings on all original buttons and their dropdowns
-    if (this._currentMobileDropdown) {
-      this._addCloseDropdownAttributes(this._mobileToggle, this._currentMobileDropdown);
-    }
-
-    // Add close attributes to built in dropdowns
-    this._addCloseDropdownAttributes(this._searchToggle, this._searchSpotMd);
-    this._addCloseDropdownAttributes(null, this._accountDropdownWrapper);
 
     // Reconnecting mutationObserver for IE11 & Edge
     if (_isCrustyBrowser()) {
-      this._observer.observe(this, lightDomObserverConfig);
-    }
-
-    // Putting of heavy DOM calculations
-    if (recalculateMenuBreakpoints) {
-      window.setTimeout(() => {
-        this._calculateMenuBreakpoints();
-        this._calculateBreakpointAttribute();
-        this._setCurrentMobileDropdown();
-        // If we have a mobile dropdown make sure it has dropdown attributes
-        if (this._currentMobileDropdown) {
-          this._addCloseDropdownAttributes(this._mobileToggle, this._currentMobileDropdown);
-        }
-        this._moveSearchSlot();
-      }, 0);
+      // this._observer.observe(this, lightDomObserverConfig);
     }
 
     if (this.isOpen()) {
       this._changeNavigationState(this.openToggle, "open");
     }
 
-    // Some cleanup and state management for after render
-    const postProcessLightDom = () => {
-      // Preventing issues in IE11 & Edge
-      if (_isCrustyBrowser()) {
-        this._observer.disconnect();
-      }
-
-      if (this.isMobileMenuButtonVisible() && !this.isOpen("mobile__button")) {
-        this._addCloseDropdownAttributes(this._mobileToggle, this._currentMobileDropdown);
-      }
-
-      // Mobile slider elements have a tab trap that will need to be updated if content has been updated
-      const mobileSliderElements = this.querySelectorAll("[mobile-slider]");
-      for (let index = 0; index < mobileSliderElements.length; index++) {
-        const currentMobileSliderElement = mobileSliderElements[index];
-        this._getLastFocusableItemInMobileSlider(currentMobileSliderElement);
-        const toggle = currentMobileSliderElement.querySelector(".pfe-navigation__secondary-link");
-        const dropdown = currentMobileSliderElement.querySelector(".pfe-navigation__dropdown");
-
-        // Add mutation observer if we don't have one already
-        if (toggle && toggle.id && dropdown && !this._mobileSliderMutationObservers[toggle.id]) {
-          this._mobileSliderMutationObservers[toggle.id] = new MutationObserver(() =>
-            this._getLastFocusableItemInMobileSlider(currentMobileSliderElement)
-          );
-          this._mobileSliderMutationObservers[toggle.id].observe(dropdown, { subtree: true, childList: true });
-        }
-      }
-
-      // Reconnecting mutationObserver for IE11 & Edge
-      if (_isCrustyBrowser()) {
-        this._observer.observe(this, lightDomObserverConfig);
-      }
-    };
-
-    window.setTimeout(postProcessLightDom, 0);
   } // end _processLightDom()
 
   /**
@@ -2208,7 +2415,7 @@ class PfeNavigation extends PFElement {
   _moveSearchSlot() {
     // Preventing issues in IE11 & Edge
     if (_isCrustyBrowser()) {
-      this._observer.disconnect();
+      // this._observer.disconnect();
     }
 
     if (this.isSecondaryLinksSectionCollapsed()) {
@@ -2229,7 +2436,7 @@ class PfeNavigation extends PFElement {
 
     // Reconnecting mutationObserver for IE11 & Edge
     if (_isCrustyBrowser()) {
-      this._observer.observe(this, lightDomObserverConfig);
+      // this._observer.observe(this, lightDomObserverConfig);
     }
   }
 
@@ -2581,34 +2788,15 @@ class PfeNavigation extends PFElement {
 
   /**
    * Handle DOM updates on the account dropdown
-   * @param {object} mutationItem Part of a mutationObserver event object for the change
+   * @param {object} mutationList Part of a mutationObserver event object for the change
    */
-  _processAccountDropdownChange(mutationItem) {
-    // If the account component doesn't exist yet we can't do anything
-    if (!this._accountComponent) {
-      // If we don't have accountComponent set yet and we can confirm this is it, set the var.
-      if (
-        mutationItem.target.getAttribute("slot") === "account" &&
-        mutationItem.target.parentElement.tagName === "PFE-NAVIGATION"
-      ) {
-        this._accountComponent = mutationItem.target;
-      }
-      // If we can't find the accountComponent and it isn't set, we can't do anything else.
-      else {
-        return;
-      }
-    }
+  _processAccountDropdownChange(mutationList) {
     if (this._accountLogInLink === null) {
       // Create login link
       const logInLink = this._accountComponent.getAttribute("login-link");
       if (logInLink) {
         this._accountOuterWrapper.prepend(this._createLogInLink(logInLink));
       }
-    } else if (mutationItem.type === "attributes" && mutationItem.attributeName === "login-link") {
-      // Deal with login link changes
-      this.shadowRoot
-        .getElementById("pfe-navigation__log-in-link")
-        .setAttribute("href", this._accountComponent.getAttribute("login-link"));
     }
 
     if (this._accountToggle === null) {
@@ -2627,9 +2815,17 @@ class PfeNavigation extends PFElement {
         // Recalculate secondary links breakpoint
         this._menuBreakpoints.secondaryLinks = null;
       }
-    } else {
+    }
+    for (let index = 0; index < mutationList.length; index++) {
+      const mutationItem = mutationList[index];
       // Deal with account toggle changes
       if (mutationItem.type === "attributes") {
+        if (mutationItem.attributeName === "login-link") {
+          // Deal with login link changes
+          this.shadowRoot
+            .getElementById("pfe-navigation__log-in-link")
+            .setAttribute("href", this._accountComponent.getAttribute("login-link"));
+        }
         if (mutationItem.attributeName === "avatar-url") {
           this._accountToggle
             .querySelector("pfe-avatar")
@@ -2647,29 +2843,6 @@ class PfeNavigation extends PFElement {
     // Then recalculate the JS breakpoints
     this._menuBounds.secondaryLinksLeft = null;
     window.setTimeout(this._calculateMenuBreakpoints, 0);
-  }
-
-  /**
-   * Handle the slot change event
-   */
-  _processAccountSlotChange() {
-    const slottedElements = this.getSlot("account");
-    if (slottedElements) {
-      this._accountOuterWrapper.hidden = false;
-      if (this._accountComponent === null) {
-        for (let index = 0; index < slottedElements.length; index++) {
-          if (
-            slottedElements[index].tagName === "PFE-NAVIGATION-ACCOUNT" ||
-            slottedElements[index].tagName === "RH-ACCOUNT-DROPDOWN"
-          ) {
-            this._accountComponent = slottedElements[index];
-            this._processAccountDropdownChange();
-          }
-        }
-      }
-    } else {
-      this._accountOuterWrapper.hidden = true;
-    }
   }
 
   /**
