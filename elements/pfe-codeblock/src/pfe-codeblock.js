@@ -2,7 +2,16 @@
 import "./polyfills--pfe-codeblock.js";
 
 import PFElement from "../../pfelement/dist/pfelement.js";
-import Prism from "prismjs";
+import Prism from "prismjs/components/prism-core";
+import "prismjs/components/prism-markup";
+import "prismjs/components/prism-html";
+import "prismjs/components/prism-xml";
+import "prismjs/components/prism-svg";
+import "prismjs/components/prism-mathml";
+import "prismjs/components/prism-css";
+import "prismjs/components/prism-clike";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-js";
 
 const observerConfig = {
   childList: true,
@@ -198,6 +207,8 @@ class PfeCodeblock extends PFElement {
       let tmpCodeblockObject = this.trimWhitespaceLines(this._codeblockContainer.textContent);
       this.codeblock = tmpCodeblockObject.stringValue;
     }
+
+    loadLanguages(["markup", "html", "xml", "svg", "mathml", "css", "clike", "javascript", "js"]);
     this._muationObserve();
   }
 
