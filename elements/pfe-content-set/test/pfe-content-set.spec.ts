@@ -6,7 +6,7 @@ import { expect, html } from '@open-wc/testing';
 import { createFixture } from '@patternfly/pfe-tools/test/create-fixture.js';
 // import { setViewport } from '@web/test-runner-commands';
 
-// import { PfeContentSet } from '@patternfly/pfe-content-set';
+import { PfeContentSet } from '@patternfly/pfe-content-set';
 // import { PfeTabPanel } from '@patternfly/pfe-tabs/pfe-tab-panel';
 
 // One element, defined here, is used
