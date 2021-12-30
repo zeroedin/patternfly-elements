@@ -103,7 +103,7 @@ function getEvents(tagName, manifest) {
  */
 function getSlots(tagName, manifest) {
   const decl = getDeclaration.call(this, tagName, manifest);
-  return decl.slots ?? [];
+  return decl?.slots ?? [];
 }
 
 /**
