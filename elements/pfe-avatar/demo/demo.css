@@ -1,3 +1,7 @@
+.custom {
+  --pfe-avatar--colors: #EE0000 #f0ab00 #007a87 #00b9e4 #92d400; 
+}
+
 pfe-band::part(body) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
